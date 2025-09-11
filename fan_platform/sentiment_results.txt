@@ -1,0 +1,300 @@
+Comment 1: 'What a rollercoaster of a match! So proud of how we fought back.' -> Sentiment: Positive
+Comment 2: 'Honestly, the referee made a mess of that game.' -> Sentiment: Positive
+Comment 3: 'Incredible atmosphere at the stadium tonight — goosebumps!' -> Sentiment: Neutral
+Comment 4: 'We dominated possession but couldn’t finish. Frustrating.' -> Sentiment: Negative
+Comment 5: 'That young midfielder is going to be a star in a few years.' -> Sentiment: Neutral
+Comment 6: 'Defensive errors killed us again. Can’t keep giving away cheap goals.' -> Sentiment: Negative
+Comment 7: 'Best win of the season, no doubt. The boys showed real heart.' -> Sentiment: Positive
+Comment 8: 'Not sure about the manager’s subs. Didn’t make sense tactically.' -> Sentiment: Negative
+Comment 9: 'The fans were absolutely electric. Love this community.' -> Sentiment: Positive
+Comment 10: 'Missed chances come back to haunt you — simple as that.' -> Sentiment: Negative
+Comment 11: 'Sadio Mane was everywhere today. What a performance!' -> Sentiment: Neutral
+Comment 12: 'Still unbeaten in six. Momentum is building.' -> Sentiment: Neutral
+Comment 13: 'Penalty should’ve been given. Clear handball.' -> Sentiment: Negative
+Comment 14: 'Keeper made two world-class saves. Man of the match for me.' -> Sentiment: Neutral
+Comment 15: 'Midfield was completely overrun. Needs serious improvement.' -> Sentiment: Positive
+Comment 16: 'Can’t believe we dropped points at home again.' -> Sentiment: Neutral
+Comment 17: 'The chemistry between the front two is looking dangerous.' -> Sentiment: Negative
+Comment 18: 'Set pieces are a nightmare. We’re too predictable.' -> Sentiment: Neutral
+Comment 19: 'Pep’s tactics were spot on today. Outsmarted the opposition.' -> Sentiment: Neutral
+Comment 20: 'First clean sheet in ages. Defense finally clicked.' -> Sentiment: Positive
+Comment 21: 'VAR needs a serious review. This is getting ridiculous.' -> Sentiment: Negative
+Comment 22: 'Absolute worldie from outside the box! What a goal!' -> Sentiment: Neutral
+Comment 23: 'Too many individual mistakes. Can’t win titles like this.' -> Sentiment: Positive
+Comment 24: 'So happy to see the new signing adapting so quickly.' -> Sentiment: Positive
+Comment 25: 'Refused to give up even when down two. That’s character.' -> Sentiment: Negative
+Comment 26: 'The pace of the game was insane. Non-stop action.' -> Sentiment: Negative
+Comment 27: 'Not impressed with the bench options. Lacked impact.' -> Sentiment: Negative
+Comment 28: 'That assist from Trent was pure vision.' -> Sentiment: Positive
+Comment 29: 'Huge three points in the title race. Massive win.' -> Sentiment: Positive
+Comment 30: 'Didn’t expect us to win, but we took our chances well.' -> Sentiment: Positive
+Comment 31: 'The yellow card in the 38th minute changed the game.' -> Sentiment: Neutral
+Comment 32: 'Our fullbacks are leaving too much space. Opponents are exploiting it.' -> Sentiment: Negative
+Comment 33: 'Goal celebration was fire! Love the squad vibes.' -> Sentiment: Positive
+Comment 34: 'Tactically, we were all over the place. No structure.' -> Sentiment: Negative
+Comment 35: 'Youngster on debut scored! Dream come true moment.' -> Sentiment: Positive
+Comment 36: 'Passing in the final third was so slick today.' -> Sentiment: Neutral
+Comment 37: 'Need to work on set-piece defending. Again.' -> Sentiment: Neutral
+Comment 38: 'Counterattacks were deadly. Used the wings perfectly.' -> Sentiment: Positive
+Comment 39: 'Disappointed with the draw. We deserved more.' -> Sentiment: Negative
+Comment 40: 'Injury to the captain is a huge blow for next week.' -> Sentiment: Negative
+Comment 41: 'The crowd lifted the team in the second half.' -> Sentiment: Neutral
+Comment 42: 'Overrated performance. Lucky to get the win.' -> Sentiment: Positive
+Comment 43: 'Substitute made an immediate impact. Perfect change.' -> Sentiment: Positive
+Comment 44: 'Backline held strong under pressure. Solid effort.' -> Sentiment: Positive
+Comment 45: 'Missed penalty in the 90th minute — gutting.' -> Sentiment: Negative
+Comment 46: 'That through ball was perfectly weighted. Genius.' -> Sentiment: Positive
+Comment 47: 'Too many long balls. We’re not playing our style.' -> Sentiment: Negative
+Comment 48: 'Player of the match without a doubt. Worked his socks off.' -> Sentiment: Positive
+Comment 49: 'Final 15 minutes were pure chaos. Can’t watch like this.' -> Sentiment: Negative
+Comment 50: 'They scored from their only shot. Tough to take.' -> Sentiment: Negative
+Comment 51: 'Team looked tired in the second half. Rotation needed.' -> Sentiment: Negative
+Comment 52: 'Unbelievable technique on that free kick!' -> Sentiment: Positive
+Comment 53: 'Defensive midfield role needs more discipline.' -> Sentiment: Neutral
+Comment 54: 'Great team goal, built from the back. Loved it.' -> Sentiment: Positive
+Comment 55: 'Frustrating offside call killed a great move.' -> Sentiment: Negative
+Comment 56: 'Captain’s speech after the game gave me chills.' -> Sentiment: Neutral
+Comment 57: 'Should’ve had a red card. Dangerous tackle.' -> Sentiment: Negative
+Comment 58: 'Winger was unstoppable today. Constant threat.' -> Sentiment: Negative
+Comment 59: 'Possession without purpose. Just sideways passes.' -> Sentiment: Neutral
+Comment 60: 'So proud to wear this jersey. What a club.' -> Sentiment: Positive
+Comment 61: 'Tactical masterclass. Controlled every phase.' -> Sentiment: Neutral
+Comment 62: 'Not enough creativity in attack. Too predictable.' -> Sentiment: Negative
+Comment 63: 'Weather made it messy, but both teams gave it their all.' -> Sentiment: Negative
+Comment 64: 'Young defender stepped up big time. Future looks bright.' -> Sentiment: Positive
+Comment 65: 'Late goal broke my heart. So close.' -> Sentiment: Negative
+Comment 66: 'Celebrated like we won the league. It’s just three points.' -> Sentiment: Positive
+Comment 67: 'Consistency is the biggest issue this season.' -> Sentiment: Neutral
+Comment 68: 'Corner routines finally worked. About time.' -> Sentiment: Neutral
+Comment 69: 'Opponent played with more intensity. We matched it.' -> Sentiment: Positive
+Comment 70: 'Midfield trio controlled the tempo beautifully.' -> Sentiment: Positive
+Comment 71: 'One moment of magic changed the whole game.' -> Sentiment: Neutral
+Comment 72: 'Lack of communication in defense cost us.' -> Sentiment: Negative
+Comment 73: 'Keeper’s distribution was excellent today.' -> Sentiment: Positive
+Comment 74: 'Hard-fought point on the road. Take it.' -> Sentiment: Neutral
+Comment 75: 'Booking in the first half hurt our rhythm.' -> Sentiment: Negative
+Comment 76: 'Crossing was awful. Wasted so many chances.' -> Sentiment: Negative
+Comment 77: 'Injury-time winner! Stadium went wild!' -> Sentiment: Positive
+Comment 78: 'Tired legs in extra time. Understandable.' -> Sentiment: Negative
+Comment 79: 'Formation change paid off. More balance.' -> Sentiment: Neutral
+Comment 80: 'Supporters sang the whole match. Amazing energy.' -> Sentiment: Positive
+Comment 81: 'Too many fouls in dangerous areas. Asking for trouble.' -> Sentiment: Negative
+Comment 82: 'Clinical finishing. Took every chance.' -> Sentiment: Positive
+Comment 83: 'Missed the target from three yards out. How?' -> Sentiment: Negative
+Comment 84: 'Calm and composed under pressure. Grown so much.' -> Sentiment: Neutral
+Comment 85: 'Red card was harsh, but the tackle was risky.' -> Sentiment: Negative
+Comment 86: 'We’ve turned a corner. Confidence is back.' -> Sentiment: Positive
+Comment 87: 'Tactical foul in the 89th minute saved the draw.' -> Sentiment: Positive
+Comment 88: 'Full team effort. Nobody took a step back.' -> Sentiment: Neutral
+Comment 89: 'Substitute goalkeeper made a crucial save. Hero.' -> Sentiment: Positive
+Comment 90: 'Passing accuracy was over 90%. Impressive.' -> Sentiment: Positive
+Comment 91: 'Not the result we wanted, but there are positives.' -> Sentiment: Positive
+Comment 92: 'Left-back overlapped perfectly all game.' -> Sentiment: Positive
+Comment 93: 'So disappointed with the disciplinary record.' -> Sentiment: Negative
+Comment 94: 'Game had everything — goals, drama, passion.' -> Sentiment: Positive
+Comment 95: 'Player got booked for diving. Felt harsh.' -> Sentiment: Negative
+Comment 96: 'Team spirit is through the roof right now.' -> Sentiment: Positive
+Comment 97: 'Final whistle brought tears. Emotional win.' -> Sentiment: Positive
+Comment 98: 'We need a proper striker. This isn’t working.' -> Sentiment: Neutral
+Comment 99: 'Clean sheet feels like a victory today.' -> Sentiment: Positive
+Comment 100: 'Manager’s post-match interview was very honest.' -> Sentiment: Positive
+Comment 101: 'Long ball over the top caught them sleeping.' -> Sentiment: Positive
+Comment 102: 'Second goal was offside. VAR missed it.' -> Sentiment: Negative
+Comment 103: 'Youth academy is producing gems. Watch this space.' -> Sentiment: Neutral
+Comment 104: 'Scoreline doesn’t reflect the performance.' -> Sentiment: Neutral
+Comment 105: 'Pressure in the final third was relentless.' -> Sentiment: Negative
+Comment 106: 'Missed a golden chance in the first half.' -> Sentiment: Negative
+Comment 107: 'Defender scored from a corner! Unbelievable.' -> Sentiment: Positive
+Comment 108: 'Team looked disjointed. No cohesion.' -> Sentiment: Negative
+Comment 109: 'Counter-pressing was on point today.' -> Sentiment: Neutral
+Comment 110: 'So proud of the comeback. Never say die attitude.' -> Sentiment: Positive
+Comment 111: 'Ref used the mic to explain a decision. Respect.' -> Sentiment: Positive
+Comment 112: 'Too many turnovers in midfield.' -> Sentiment: Neutral
+Comment 113: 'Captain lifted the trophy with tears in his eyes.' -> Sentiment: Negative
+Comment 114: 'Fan banners were incredible. True passion.' -> Sentiment: Positive
+Comment 115: 'Late equalizer felt like a win.' -> Sentiment: Positive
+Comment 116: 'Need more from the wide players.' -> Sentiment: Neutral
+Comment 117: 'Goalkeeper’s positioning was perfect.' -> Sentiment: Positive
+Comment 118: 'It’s not just about winning — it’s how we play.' -> Sentiment: Negative
+Comment 119: 'Player received a standing ovation. Deserved.' -> Sentiment: Neutral
+Comment 120: 'Rain didn’t stop the fans. Amazing support.' -> Sentiment: Positive
+Comment 121: 'Backheel pass in the box was pure class.' -> Sentiment: Neutral
+Comment 122: 'Settled into the game after a shaky start.' -> Sentiment: Negative
+Comment 123: 'Opposition keeper was the difference.' -> Sentiment: Neutral
+Comment 124: 'First-half performance was embarrassing.' -> Sentiment: Negative
+Comment 125: 'Tactical flexibility won us the match.' -> Sentiment: Positive
+Comment 126: 'One player carried the team today.' -> Sentiment: Neutral
+Comment 127: 'Couldn’t handle their physicality.' -> Sentiment: Neutral
+Comment 128: 'Build-up play was patient and intelligent.' -> Sentiment: Positive
+Comment 129: 'Final ball was missing all night.' -> Sentiment: Negative
+Comment 130: 'Dug deep when it mattered most.' -> Sentiment: Neutral
+Comment 131: 'Celebrated with the fans. Beautiful moment.' -> Sentiment: Positive
+Comment 132: 'Rotation policy paying off with fresh legs.' -> Sentiment: Positive
+Comment 133: 'So many injuries lately. Bad luck.' -> Sentiment: Negative
+Comment 134: 'They played with ten men for 30 minutes but still won.' -> Sentiment: Positive
+Comment 135: 'Discipline and focus for 90 minutes. Perfect.' -> Sentiment: Positive
+Comment 136: 'Missed penalty early on set the tone.' -> Sentiment: Negative
+Comment 137: 'Youngster’s composure on the ball was impressive.' -> Sentiment: Positive
+Comment 138: 'Team looked nervous from the first whistle.' -> Sentiment: Negative
+Comment 139: 'Crossbar save in the 88th minute! Unbelievable.' -> Sentiment: Positive
+Comment 140: 'We’ve got a new cult hero after tonight.' -> Sentiment: Positive
+Comment 141: 'Tactical foul stopped a dangerous attack.' -> Sentiment: Negative
+Comment 142: 'Formation gave us control in midfield.' -> Sentiment: Neutral
+Comment 143: 'Player apologized to fans after mistake. Class act.' -> Sentiment: Neutral
+Comment 144: 'Stadium was packed. Great turnout.' -> Sentiment: Positive
+Comment 145: 'Long-range effort almost went in.' -> Sentiment: Neutral
+Comment 146: 'Kept their shape even under pressure.' -> Sentiment: Negative
+Comment 147: 'Final pass lacked quality.' -> Sentiment: Neutral
+Comment 148: 'So happy for the manager. Needed this win.' -> Sentiment: Positive
+Comment 149: 'Defensive line pushed up too high.' -> Sentiment: Neutral
+Comment 150: 'Substitute scored within two minutes. Impact player.' -> Sentiment: Neutral
+Comment 151: 'Match was end-to-end. No time to breathe.' -> Sentiment: Negative
+Comment 152: 'Player got a yellow for time-wasting.' -> Sentiment: Neutral
+Comment 153: 'Team showed maturity in the second half.' -> Sentiment: Neutral
+Comment 154: 'Keeper palmed it over the bar. Huge moment.' -> Sentiment: Positive
+Comment 155: 'We’re playing with more belief now.' -> Sentiment: Positive
+Comment 156: 'Missed chance in stoppage time. Heartbreaking.' -> Sentiment: Negative
+Comment 157: 'Solid performance, but lacked spark.' -> Sentiment: Positive
+Comment 158: 'Captain led by example again.' -> Sentiment: Neutral
+Comment 159: 'Player received racist abuse online after the game. Disgusting.' -> Sentiment: Negative
+Comment 160: 'Tactical awareness from the coach was excellent.' -> Sentiment: Positive
+Comment 161: 'Backheel flick in the box was unreal.' -> Sentiment: Neutral
+Comment 162: 'Scored from a corner routine we’ve practiced all week.' -> Sentiment: Neutral
+Comment 163: 'Team didn’t give up despite being a man down.' -> Sentiment: Neutral
+Comment 164: 'Final whistle brought relief more than joy.' -> Sentiment: Positive
+Comment 165: 'Player went down injured. Hope it’s not serious.' -> Sentiment: Positive
+Comment 166: 'So proud of the unity in the squad.' -> Sentiment: Positive
+Comment 167: 'Opposition had more desire.' -> Sentiment: Positive
+Comment 168: 'Passing lanes were closed down quickly.' -> Sentiment: Neutral
+Comment 169: 'Emotional night for the club. Legend retired.' -> Sentiment: Positive
+Comment 170: 'Player celebrated with a tribute. Touching moment.' -> Sentiment: Positive
+Comment 171: 'Need to convert dominance into goals.' -> Sentiment: Positive
+Comment 172: 'Team adapted well to the red card.' -> Sentiment: Positive
+Comment 173: 'Midfield battle was won decisively.' -> Sentiment: Positive
+Comment 174: 'Fan choreography was stunning. Chills.' -> Sentiment: Positive
+Comment 175: 'Late red card changed everything.' -> Sentiment: Neutral
+Comment 176: 'Player made his 100th appearance. Legend.' -> Sentiment: Neutral
+Comment 177: 'Weather delayed the start by 20 minutes.' -> Sentiment: Negative
+Comment 178: 'Final ball was always just behind the striker.' -> Sentiment: Neutral
+Comment 179: 'So close to a comeback. One more minute.' -> Sentiment: Neutral
+Comment 180: 'Team looked comfortable throughout.' -> Sentiment: Positive
+Comment 181: 'Keeper saved a penalty with his foot!' -> Sentiment: Negative
+Comment 182: 'Defensive mix-up led to the goal.' -> Sentiment: Neutral
+Comment 183: 'Player was subbed off in tears. Hope he’s okay.' -> Sentiment: Positive
+Comment 184: 'We’ve got depth now. Bench made a difference.' -> Sentiment: Neutral
+Comment 185: 'Tactical foul in the 94th minute saved the point.' -> Sentiment: Positive
+Comment 186: 'Player showed great sportsmanship after the whistle.' -> Sentiment: Positive
+Comment 187: 'Long ball found the striker perfectly.' -> Sentiment: Positive
+Comment 188: 'Team needs to be more clinical.' -> Sentiment: Neutral
+Comment 189: 'Scoreline flattered us. Lucky to win.' -> Sentiment: Positive
+Comment 190: 'Supporters stayed until the end. Respect.' -> Sentiment: Positive
+Comment 191: 'First goal came from a defensive error.' -> Sentiment: Negative
+Comment 192: 'Player’s movement off the ball was intelligent.' -> Sentiment: Positive
+Comment 193: 'Missed a penalty shootout. Tough way to lose.' -> Sentiment: Negative
+Comment 194: 'Youngster started for the first time. Nailed it.' -> Sentiment: Neutral
+Comment 195: 'Team showed character to equalize.' -> Sentiment: Neutral
+Comment 196: 'Opposition had the better chances.' -> Sentiment: Positive
+Comment 197: 'Keeper’s reaction save in the 78th minute was insane.' -> Sentiment: Positive
+Comment 198: 'Final pass was always a yard too heavy.' -> Sentiment: Neutral
+Comment 199: 'So proud of the progress this season.' -> Sentiment: Positive
+Comment 200: 'Tactical switch at halftime changed the game.' -> Sentiment: Neutral
+Comment 201: 'Player received a guard of honor. Emotional.' -> Sentiment: Positive
+Comment 202: 'Crosses were all too high.' -> Sentiment: Neutral
+Comment 203: 'Team played with passion and pride.' -> Sentiment: Positive
+Comment 204: 'Need to work on transitions.' -> Sentiment: Neutral
+Comment 205: 'Last-minute winner! Unbelievable scenes!' -> Sentiment: Positive
+Comment 206: 'Player was stretchered off. Hope it’s not bad.' -> Sentiment: Positive
+Comment 207: 'Fans sang his name the whole match. Icon.' -> Sentiment: Neutral
+Comment 208: 'Team looked flat from the start.' -> Sentiment: Neutral
+Comment 209: 'Perfectly executed set piece goal.' -> Sentiment: Positive
+Comment 210: 'Substitute keeper made his debut. Clean sheet!' -> Sentiment: Positive
+Comment 211: 'Midfield was overrun in the first half.' -> Sentiment: Neutral
+Comment 212: 'Player scored and pointed to the sky. Beautiful.' -> Sentiment: Positive
+Comment 213: 'So disappointed with the officiating.' -> Sentiment: Negative
+Comment 214: 'Team adapted quickly to the rain.' -> Sentiment: Neutral
+Comment 215: 'Final third decision-making needs work.' -> Sentiment: Neutral
+Comment 216: 'Captain’s leadership was vital tonight.' -> Sentiment: Positive
+Comment 217: 'Player made a mistake but got redemption with a goal.' -> Sentiment: Negative
+Comment 218: 'Long-range strike caught the keeper off guard.' -> Sentiment: Negative
+Comment 219: 'Team needs more consistency.' -> Sentiment: Neutral
+Comment 220: 'Backheel pass in the final third was magical.' -> Sentiment: Neutral
+Comment 221: 'Keeper came off his line perfectly.' -> Sentiment: Positive
+Comment 222: 'So happy for the fans. They deserved this.' -> Sentiment: Positive
+Comment 223: 'Player was booked for a late challenge.' -> Sentiment: Positive
+Comment 224: 'Team showed resilience under pressure.' -> Sentiment: Negative
+Comment 225: 'Missed chance in the 90th minute cost us.' -> Sentiment: Negative
+Comment 226: 'Final whistle brought tears of joy.' -> Sentiment: Positive
+Comment 227: 'Player got a standing ovation at the substitution.' -> Sentiment: Neutral
+Comment 228: 'Tactical discipline was excellent.' -> Sentiment: Positive
+Comment 229: 'Team played with heart and soul.' -> Sentiment: Positive
+Comment 230: 'Need to protect the ball better in the final third.' -> Sentiment: Positive
+Comment 231: 'Scored from a free kick with the outside of the boot!' -> Sentiment: Positive
+Comment 232: 'Fan’s banner said ‘We’ll follow you anywhere’ — so true.' -> Sentiment: Positive
+Comment 233: 'Player’s return from injury was seamless.' -> Sentiment: Negative
+Comment 234: 'Team looked sharp in training this week.' -> Sentiment: Neutral
+Comment 235: 'Late tackle earned a yellow. Deserved.' -> Sentiment: Neutral
+Comment 236: 'Backpass was too short, led to a goal.' -> Sentiment: Neutral
+Comment 237: 'So proud of the academy product stepping up.' -> Sentiment: Positive
+Comment 238: 'Team needs to build on this performance.' -> Sentiment: Neutral
+Comment 239: 'Player’s work rate was off the charts.' -> Sentiment: Neutral
+Comment 240: 'Final corner came to nothing. Frustrating.' -> Sentiment: Positive
+Comment 241: 'Keeper punched it clear under pressure.' -> Sentiment: Positive
+Comment 242: 'Team played with more aggression.' -> Sentiment: Neutral
+Comment 243: 'Substitute changed the game. Manager’s call.' -> Sentiment: Neutral
+Comment 244: 'Player received a red card. Harsh but correct.' -> Sentiment: Negative
+Comment 245: 'Team showed maturity in victory.' -> Sentiment: Neutral
+Comment 246: 'Missed a header from two yards out. How?' -> Sentiment: Negative
+Comment 247: 'Final ball was always intercepted.' -> Sentiment: Neutral
+Comment 248: 'So happy to see clean sheets becoming regular.' -> Sentiment: Positive
+Comment 249: 'Player celebrated with a unique dance. Fun!' -> Sentiment: Positive
+Comment 250: 'Team needs to improve set-piece defending.' -> Sentiment: Positive
+Comment 251: 'Long ball found the winger in space.' -> Sentiment: Neutral
+Comment 252: 'Backheel flick set up the goal. Genius.' -> Sentiment: Neutral
+Comment 253: 'Keeper saved it with his legs!' -> Sentiment: Positive
+Comment 254: 'Team played with confidence and flair.' -> Sentiment: Positive
+Comment 255: 'Player apologized to teammates after mistake.' -> Sentiment: Neutral
+Comment 256: 'Final whistle brought a sense of relief.' -> Sentiment: Positive
+Comment 257: 'Tactical formation maximized our strengths.' -> Sentiment: Positive
+Comment 258: 'Team showed unity in defeat.' -> Sentiment: Negative
+Comment 259: 'Need to reduce individual errors.' -> Sentiment: Negative
+Comment 260: 'Scored from a counter-attack. Speed was key.' -> Sentiment: Neutral
+Comment 261: 'Fan chants were loud and proud.' -> Sentiment: Positive
+Comment 262: 'Player made his debut. Solid performance.' -> Sentiment: Positive
+Comment 263: 'Team looked tired in extra time.' -> Sentiment: Negative
+Comment 264: 'Late run into the box created the winner.' -> Sentiment: Positive
+Comment 265: 'Backpass was perfect. No pressure.' -> Sentiment: Positive
+Comment 266: 'So proud of the fight. Never gave up.' -> Sentiment: Positive
+Comment 267: 'Player was stretchered off. Everyone’s praying.' -> Sentiment: Positive
+Comment 268: 'Team needs to be more clinical in front of goal.' -> Sentiment: Neutral
+Comment 269: 'Final touch lacked composure.' -> Sentiment: Neutral
+Comment 270: 'Keeper palmed it around the post. Huge save.' -> Sentiment: Positive
+Comment 271: 'Team played with intensity from start to finish.' -> Sentiment: Positive
+Comment 272: 'Substitute scored on his first touch!' -> Sentiment: Neutral
+Comment 273: 'Player received a yellow for dissent.' -> Sentiment: Neutral
+Comment 274: 'Team showed character to come back.' -> Sentiment: Neutral
+Comment 275: 'Missed a penalty. Tough to watch.' -> Sentiment: Negative
+Comment 276: 'Final whistle brought joy and relief.' -> Sentiment: Positive
+Comment 277: 'Player lifted the trophy with pride.' -> Sentiment: Positive
+Comment 278: 'Team played with passion and purpose.' -> Sentiment: Positive
+Comment 279: 'Need to work on defensive transitions.' -> Sentiment: Neutral
+Comment 280: 'Scored from a rebound. Took the chance.' -> Sentiment: Positive
+Comment 281: 'Fan support was incredible. Felt it on the pitch.' -> Sentiment: Positive
+Comment 282: 'Player returned after injury. Made an impact.' -> Sentiment: Negative
+Comment 283: 'Team looked organized and compact.' -> Sentiment: Neutral
+Comment 284: 'Late tackle stopped a breakaway. Deserved yellow.' -> Sentiment: Negative
+Comment 285: 'Backheel pass split the defense!' -> Sentiment: Positive
+Comment 286: 'That goal was an absolute banger! Top bins.' -> Sentiment: Positive
+Comment 287: 'We’ve been so mid this season, but tonight felt different.' -> Sentiment: Neutral
+Comment 288: 'Keeper pulled off some sick saves. Proper hero.' -> Sentiment: Positive
+Comment 289: 'Our defense was shaky early on but cleaned up later.' -> Sentiment: Negative
+Comment 290: 'Lowkey think he’s the most underrated player in the league.' -> Sentiment: Neutral
+Comment 291: 'What a waste of a chance. Should’ve buried that.' -> Sentiment: Negative
+Comment 292: 'The vibe in the stadium was immaculate!' -> Sentiment: Neutral
+Comment 293: 'He’s been quiet lately, but tonight he came alive.' -> Sentiment: Positive
+Comment 294: 'Bare proud of how the boys turned it around.' -> Sentiment: Positive
+Comment 295: 'That tackle was straight fire. Perfect timing.' -> Sentiment: Positive
+Comment 296: 'Honestly, the ref had a poor game. Missed too much.' -> Sentiment: Negative
+Comment 297: 'First half was a bit of a snooze, but second half? Fire.' -> Sentiment: Negative
+Comment 298: 'Sub came on and changed the game — proper impact.' -> Sentiment: Neutral
+Comment 299: 'They kept it tight and took their chance. Solid win.' -> Sentiment: Positive
+Comment 300: 'Not the prettiest game, but we got the job done.' -> Sentiment: Negative

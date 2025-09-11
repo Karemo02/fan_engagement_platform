@@ -1,0 +1,39 @@
+{% extends 'engagement/base.html' %}
+<!-- Use base.html for consistent header/footer across the app -->
+{% block title %}Login - Fan Hub{% endblock %}
+<!-- Set page title for browser tab -->
+{% block content %}
+    <div class="max-w-md mx-auto p-6 bg-gray-700 rounded-lg shadow-lg">
+        <!-- Center form with dark background and shadow for a cool look -->
+        <h2 class="text-2xl font-bold mb-4 text-center">Login</h2>
+        <!-- Bold heading for the form -->
+        {% if messages %}
+            <!-- Check for backend messages (e.g., errors) -->
+            {% for message in messages %}
+                <p class="text-red-500 mb-2">{{ message }}</p>
+                <!-- Show messages in red for clarity -->
+            {% endfor %}
+        {% endif %}
+        <form method="post" action="{% url 'engagement:login' %}">
+            <!-- Form submits to login view -->
+            {% csrf_token %}
+            <!-- Security token to prevent attacks -->
+            <div class="mb-4">
+                <!-- Username field with spacing -->
+                <label class="block mb-2">Username</label>
+                <input type="text" name="username" class="w-full p-2 bg-gray-600 rounded-lg text-white" required>
+                <!-- Text box for username, matches dark theme -->
+            </div>
+            <div class="mb-4">
+                <!-- Password field -->
+                <label class="block mb-2">Password</label>
+                <input type="password" name="password" class="w-full p-2 bg-gray-600 rounded-lg text-white" required>
+                <!-- Password box, hidden for security -->
+            </div>
+            <button type="submit" class="w-full bg-yellow-500 text-gray-900 px-4 py-2 rounded-lg hover:bg-yellow-600 transition">Login</button>
+            <!-- Yellow submit button with hover effect -->
+        </form>
+        <p class="mt-4 text-center"><a href="{% url 'engagement:register' %}" class="text-yellow-300 hover:underline">Register here</a></p>
+        <!-- Link to register page -->
+    </div>
+{% endblock %}

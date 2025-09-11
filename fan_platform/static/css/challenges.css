@@ -1,0 +1,12 @@
+.nudge {
+    color: #FFD700; /* Gold for encouragement */
+    font-style: italic;
+    margin: 0.5em 0;
+}
+input[type="text"] {
+    width: 100%;
+    padding: 0.5em;
+    margin: 1em 0;
+    background-color: #FFFFFF;
+    color: #228B22;
+}

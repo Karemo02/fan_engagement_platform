@@ -1,0 +1,112 @@
+<html lang="en">
+<!-- Set HTML language to English -->
+<head>
+    <meta charset="UTF-8">
+    <!-- Use UTF-8 encoding -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Ensure responsive design -->
+    <title>{% block title %}Fan Engagement Platform{% endblock %}</title>
+    <!-- Define page title, overridden by child templates -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Tailwind CSS via CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Load Oswald font for sporty look -->
+    <style>
+        body {
+            font-family: 'Oswald', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
+            background-size: cover;
+            background-attachment: fixed;
+            /* Dark gradient background for football vibe */
+        }
+        .stadium-effect {
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Cpath d="M0 50 Q25 0 50 0 T100 50 Q75 100 50 100 T0 50 Z" fill="none" stroke="%23ffffff" stroke-width="1" opacity="0.1"/%3E%3C/svg%3E');
+            background-repeat: repeat;
+            /* Subtle stadium pattern for main content */
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+            /* Animation for fading in elements */
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in;
+            /* Apply fade-in animation */
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            /* Custom scrollbar width */
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #4a5568;
+            border-radius: 4px;
+            /* Scrollbar track styling */
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #a0aec0;
+            border-radius: 4px;
+            /* Scrollbar thumb styling */
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #718096;
+            /* Scrollbar thumb hover effect */
+        }
+        .clip-diamond {
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            /* Diamond shape for avatars */
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Set white text for dark theme -->
+    <header class="bg-gradient-to-r from-gray-800 to-gray-900 p-4 shadow-lg">
+        <!-- Header with gradient background -->
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Center content with flex layout -->
+            <h1 class="text-3xl font-bold">Fan Hub</h1>
+            <!-- App title -->
+            <nav class="space-x-4">
+                <!-- Navigation links -->
+                <a href="{% url 'engagement:home' %}" class="hover:text-yellow-300 transition">Home</a>
+                <!-- Link to home page -->
+                <a href="{% url 'engagement:fixtures' %}" class="hover:text-yellow-300 transition">Fixtures</a>
+                <!-- Link to fixtures page -->
+                <a href="{% url 'engagement:news' %}" class="hover:text-yellow-300 transition">News</a>
+                <!-- Link to news page -->
+                <a href="{% url 'engagement:leaderboard' %}" class="hover:text-yellow-300 transition">Leaderboard</a>
+                <!-- Link to leaderboard page -->
+                <a href="{% url 'engagement:challenges' %}" class="hover:text-yellow-300 transition">Challenges</a>
+                <!-- Link to challenges page -->
+                {% if user.is_authenticated %}
+                    <!-- Show if user is logged in -->
+                    {% if live_fixtures.exists %}
+                        <!-- Show if live matches exist -->
+                        <a href="{% url 'engagement:live_match' %}" class="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition">
+                            Match in Progress—Watch Now!
+                        </a>
+                        <!-- Link to live match page -->
+                    {% endif %}
+                {% endif %}
+                {% if user.is_authenticated %}
+                    <!-- Show logout for authenticated users -->
+                    <a href="{% url 'engagement:logout' %}" class="hover:text-yellow-300 transition">Logout</a>
+                {% else %}
+                    <!-- Show login/register for guests -->
+                    <a href="{% url 'engagement:login' %}" class="hover:text-yellow-300 transition">Login</a>
+                    <a href="{% url 'engagement:register' %}" class="hover:text-yellow-300 transition">Register</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+    <main class="container mx-auto py-6 stadium-effect">
+        <!-- Main content area with stadium effect -->
+        {% block content %}{% endblock %}
+        <!-- Placeholder for page-specific content -->
+    </main>
+    <footer class="bg-gray-800 p-4 text-center mt-6">
+        <!-- Footer with dark background -->
+        <p>&copy; 2025 Fan Engagement Platform</p>
+        <!-- Copyright notice -->
+    </footer>
+</body>
+</html>

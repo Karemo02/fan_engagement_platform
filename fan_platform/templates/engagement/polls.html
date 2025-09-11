@@ -1,0 +1,80 @@
+{% extends 'engagement/base.html' %}
+<!-- Use base.html for consistent header/footer across the app -->
+{% block title %}Polls - Fan Hub{% endblock %}
+<!-- Set page title for browser tab -->
+{% block content %}
+    <div class="p-6 bg-gray-800 min-h-screen">
+        <!-- Main container with dark background, full height -->
+        <h2 class="text-4xl font-bold text-white mb-8 bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-lg shadow-lg text-center">Polls</h2>
+        <!-- Big heading with gradient background for a sporty vibe -->
+        {% if messages %}
+            <!-- Check for backend messages like errors or success -->
+            {% for message in messages %}
+                <div class="p-4 mb-6 rounded-lg text-center shadow-md {% if 'error' in message.tags %}bg-red-600 text-white{% else %}bg-green-600 text-white{% endif %} animate-fade-in">
+                    <!-- Show messages in red for errors, green for success -->
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% for poll in polls %}
+            <!-- Loop through polls from the backend -->
+            <div class="bg-gray-700 p-6 rounded-lg shadow-xl mb-8 border border-gray-600 hover:bg-gray-650 transition duration-300 ease-in-out">
+                <!-- Poll card with dark background, shadow, and hover effect -->
+                <h3 class="text-2xl font-semibold text-white mb-6 bg-gray-800 p-3 rounded-md">{{ poll.question }}</h3>
+                <!-- Poll question in a styled box -->
+                {% if poll.id not in voted_poll_ids or poll.end_date < timezone.now %}
+                    <!-- Show voting form if user hasn't voted or poll is expired -->
+                    <form method="post" action="{% url 'engagement:polls' %}">
+                        <!-- Form submits vote to polls view -->
+                        {% csrf_token %}
+                        <!-- Security token to prevent attacks -->
+                        <input type="hidden" name="poll_id" value="{{ poll.id }}">
+                        <!-- Hidden field to track poll ID -->
+                        <div class="flex items-center p-4 bg-gray-600 rounded-md hover:bg-gray-700 transition-colors duration-200 cursor-pointer">
+                            <!-- Option 1 with radio button and hover effect -->
+                            <input type="radio" name="vote" value="{{ poll.option1 }}" class="form-radio h-5 w-5 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-4 text-lg text-white">{{ poll.option1 }}</span>
+                        </div>
+                        <div class="flex items-center p-4 bg-gray-600 rounded-md hover:bg-gray-700 transition-colors duration-200 cursor-pointer">
+                            <!-- Option 2 with radio button -->
+                            <input type="radio" name="vote" value="{{ poll.option2 }}" class="form-radio h-5 w-5 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-4 text-lg text-white">{{ poll.option2 }}</span>
+                        </div>
+                        {% if poll.option3 %}
+                            <!-- Option 3 if it exists -->
+                            <div class="flex items-center p-4 bg-gray-600 rounded-md hover:bg-gray-700 transition-colors duration-200 cursor-pointer">
+                                <input type="radio" name="vote" value="{{ poll.option3 }}" class="form-radio h-5 w-5 text-blue-600 focus:ring-blue-500">
+                                <span class="ml-4 text-lg text-white">{{ poll.option3 }}</span>
+                            </div>
+                        {% endif %}
+                        <button type="submit" class="w-full mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1">
+                            <!-- Blue submit button with hover and lift effect -->
+                            Vote Now
+                        </button>
+                    </form>
+                {% else %}
+                    <!-- Show poll results if user has voted or poll is active -->
+                    <div class="space-y-4">
+                        <div class="p-4 bg-gray-600 rounded-md">
+                            <!-- Results for option 1 -->
+                            <p class="text-lg text-white">{{ poll.option1 }}: <span class="font-bold">{{ poll.votes_option1 }}</span> votes</p>
+                        </div>
+                        <div class="p-4 bg-gray-600 rounded-md">
+                            <!-- Results for option 2 -->
+                            <p class="text-lg text-white">{{ poll.option2 }}: <span class="font-bold">{{ poll.votes_option2 }}</span> votes</p>
+                        </div>
+                        {% if poll.option3 %}
+                            <!-- Results for option 3 if it exists -->
+                            <div class="p-4 bg-gray-600 rounded-md">
+                                <p class="text-lg text-white">{{ poll.option3 }}: <span class="font-bold">{{ poll.votes_option3 }}</span> votes</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <!-- Message if no polls are available -->
+            <p class="text-center text-white text-xl">No polls available yet.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

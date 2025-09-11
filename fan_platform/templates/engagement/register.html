@@ -1,0 +1,52 @@
+{% extends 'engagement/base.html' %}
+<!-- Use base.html for consistent header/footer across the app -->
+{% block title %}Register - Fan Hub{% endblock %}
+<!-- Set page title for browser tab -->
+{% block content %}
+    <div class="max-w-md mx-auto p-6 bg-gray-700 rounded-lg shadow-lg">
+        <!-- Center form with dark background and shadow for a cool look -->
+        <h2 class="text-2xl font-bold mb-4 text-center">Register</h2>
+        <!-- Bold heading for the form -->
+        {% if messages %}
+            <!-- Check for backend messages -->
+            {% for message in messages %}
+                <p class="text-red-500 mb-2">{{ message }}</p>
+                <!-- Show messages in red for clarity -->
+            {% endfor %}
+        {% endif %}
+        <form method="post" action="{% url 'engagement:register' %}">
+            <!-- Form submits to register view -->
+            {% csrf_token %}
+            <!-- Security token to prevent attacks -->
+            <div class="mb-4">
+                <!-- Username field -->
+                <label class="block mb-2">Username</label>
+                <input type="text" name="username" class="w-full p-2 bg-gray-600 rounded-lg text-white" required>
+                <!-- Text box for username, matches dark theme -->
+            </div>
+            <div class="mb-4">
+                <!-- Password field -->
+                <label class="block mb-2">Password</label>
+                <input type="password" name="password" class="w-full p-2 bg-gray-600 rounded-lg text-white" required>
+                <!-- Password box, hidden for security -->
+            </div>
+            <div class="mb-4">
+                <!-- Dropdown for picking favorite clubs -->
+                <label class="block mb-2">Select Clubs (Max 2)</label>
+                <select name="clubs" multiple class="w-full p-2 bg-gray-600 rounded-lg text-white" size="3" required>
+                    <!-- List all clubs from database -->
+                    {% for club in clubs %}
+                        <option value="{{ club.id }}">{{ club.name }}</option>
+                        <!-- Club option with ID and name -->
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="w-full bg-yellow-500 text-gray-900 px-4 py-2 rounded-lg hover:bg-yellow-600 transition">
+                <!-- Yellow submit button with hover effect -->
+                Register
+            </button>
+        </form>
+        <p class="mt-4 text-center"><a href="{% url 'engagement:login' %}" class="text-yellow-300 hover:underline">Back to Login</a></p>
+        <!-- Link back to login page -->
+    </div>
+{% endblock %}

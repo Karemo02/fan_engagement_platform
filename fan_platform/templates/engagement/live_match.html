@@ -1,0 +1,317 @@
+{% extends "engagement/base.html" %}
+<!-- Use base.html for consistent header/footer across the app -->
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white font-sans">
+    <!-- Main container with gradient background for sporty vibe -->
+    <!-- Live Match Banner -->
+    <div class="w-full bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-center shadow-lg">
+        <!-- Banner with gradient for match title -->
+        <h1 class="text-5xl font-extrabold tracking-wide animate-fade-in">
+            Live Match: {{ fixture.club.name }} vs {{ fixture.opponent }}
+        </h1>
+        <!-- Big heading for match teams -->
+        <div class="mt-2 text-lg font-medium text-gray-200">
+            Experience the Action in Real-Time!
+        </div>
+        <!-- Subheading for excitement -->
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Responsive grid for layout -->
+        <!-- Score and Timer Section -->
+        <div class="lg:col-span-1 bg-gray-800 bg-opacity-90 rounded-xl p-6 shadow-xl transform transition duration-300 hover:scale-105">
+            <!-- Score/timer card with hover zoom -->
+            <div class="text-center">
+                <div id="match-score" class="text-7xl font-extrabold text-yellow-400 animate-pulse mb-4">
+                    {{ match_data.home_score }} - {{ match_data.away_score }}
+                </div>
+                <!-- Display live score -->
+                <div id="match-timer" class="text-3xl font-semibold text-gray-300 bg-gray-700 p-3 rounded-lg">
+                    Time: 00:00
+                </div>
+                <!-- Display match timer -->
+            </div>
+        </div>
+
+        <!-- Commentary Section -->
+        <div class="lg:col-span-2 bg-gray-800 bg-opacity-90 rounded-xl p-6 shadow-xl overflow-hidden">
+            <!-- Commentary card with scrollable events -->
+            <h3 class="text-2xl font-bold mb-4 text-white border-b-2 border-purple-600 pb-2">
+                Live Commentary
+            </h3>
+            <!-- Heading for commentary -->
+            <div class="h-64 overflow-y-auto custom-scrollbar">
+                <!-- Scrollable event list -->
+                <ul id="match-events" class="list-disc pl-6 text-lg text-gray-200 space-y-3">
+                    <!-- Events will be added dynamically -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="col-span-1 bg-gray-800 bg-opacity-90 rounded-xl p-6 shadow-xl">
+            <!-- Comment card for fan chat -->
+            <h3 class="text-2xl font-bold mb-4 text-white border-b-2 border-blue-600 pb-2">
+                Live Match Chat 💬
+            </h3>
+            <!-- Heading for chat -->
+            <!-- Post a Comment -->
+            <div class="mb-6">
+                <!-- Comment form container -->
+                {% if messages %}
+                    <!-- Check for backend messages -->
+                    {% for message in messages %}
+                        <p class="text-{% if 'error' in message.tags %}red-500{% else %}green-500{% endif %} mb-2 font-medium">
+                            {{ message }}
+                        </p>
+                        <!-- Show messages in red for errors, green for success -->
+                    {% endfor %}
+                {% endif %}
+                <form id="commentForm" method="POST" action="{% url 'engagement:live_match' %}" class="flex flex-col space-y-4">
+                    <!-- Form to post comment -->
+                    {% csrf_token %}
+                    <!-- Security token to prevent attacks -->
+                    {{ comment_form.as_p }}
+                    <!-- Render comment form fields -->
+                    <button type="submit" class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+                        Post Comment
+                    </button>
+                    <!-- Blue submit button with hover lift -->
+                    <div id="comment-message" class="mt-2 text-center"></div>
+                    <!-- Placeholder for AJAX messages -->
+                </form>
+            </div>
+
+            <!-- Display Comments -->
+            <div class="h-64 overflow-y-auto custom-scrollbar">
+                <!-- Scrollable comment list -->
+                <ul id="commentsList" class="list-none p-0 space-y-4">
+                    <!-- List for comments -->
+                    {% for comment in comments %}
+                        <!-- Loop through comments -->
+                        <li class="p-4 bg-gray-700 rounded-lg flex items-start space-x-3">
+                            <!-- Comment item -->
+                            <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0"></div>
+                            <!-- Simulated avatar -->
+                            <div>
+                                <strong class="text-blue-300">{{ comment.user_profile.user.username }}</strong>
+                                <span class="text-gray-400 text-sm ml-2">({{ comment.created_at|date:"H:i d M" }})</span>
+                                <!-- Username and timestamp -->
+                                <p class="mt-1 text-gray-100">{{ comment.text }}</p>
+                                <!-- Comment text -->
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div id="no-comments-message" class="{% if comments %}hidden{% endif %}">
+                    <!-- Message if no comments -->
+                    <p class="text-gray-400 text-center py-4">No comments yet. Be the first to comment!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final Result Section -->
+    <div id="final-result-container" class="hidden max-w-6xl mx-auto px-4 py-8 text-center bg-gray-800 bg-opacity-90 rounded-xl shadow-xl">
+        <!-- Hidden container for final score -->
+        <p class="text-white font-bold text-4xl">Final Result: {{ match_data.home_score }} - {{ match_data.away_score }}</p>
+        <!-- Display final result -->
+    </div>
+    <div class="max-w-6xl mx-auto px-4 py-4 text-center">
+        <!-- Back to home link container -->
+        <a href="{% url 'engagement:home' %}" class="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+            Back to Home
+        </a>
+        <!-- Link to home page -->
+    </div>
+</div>
+
+<style>
+    <!-- Custom CSS for animations and scrollbar -->
+    .animate-fade-in {
+        animation: fadeIn 1s ease-in;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #4a5568;
+        border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #a0aec0;
+        border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #718096;
+    }
+</style>
+
+<script>
+    // Wait for page to load
+    document.addEventListener("DOMContentLoaded", function() {
+        const commentForm = document.getElementById("commentForm");
+        const commentsList = document.getElementById("commentsList");
+        const noCommentsMessage = document.getElementById("no-comments-message");
+
+        // Handle comment form submission via AJAX
+        commentForm.addEventListener("submit", function(e) {
+            e.preventDefault(); // Stop normal form submission
+            const formData = new FormData(commentForm); // Get form data
+            fetch("{% url 'engagement:live_match' %}", { // Send to live_match view
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest", // Mark as AJAX
+                    "X-CSRFToken": formData.get("csrfmiddlewaretoken") // Include CSRF token
+                }
+            })
+            .then(response => response.json()) // Parse JSON response
+            .then(data => {
+                if (data.status === "success") { // Check if comment was added
+                    const li = document.createElement("li"); // Create new comment item
+                    li.className = "p-4 bg-gray-700 rounded-lg flex items-start space-x-3";
+                    li.innerHTML = `
+                        <div class="w-10 h-10 bg-gray-600 rounded-full flex-shrink-0"></div>
+                        <div>
+                            <strong class="text-blue-300">${data.username}</strong>
+                            <span class="text-gray-400 text-sm ml-2">(${data.created_at})</span>
+                            <p class="mt-1 text-gray-100">${data.text}</p>
+                        </div>`;
+                    commentsList.insertBefore(li, commentsList.firstChild); // Add to top
+                    commentForm.reset(); // Clear form
+                    document.getElementById('comment-message').innerHTML = '<p class="text-green-500 font-medium">✅ Comment added!</p>'; // Show success
+                    if (noCommentsMessage) { // Hide no-comments message
+                        noCommentsMessage.classList.add('hidden');
+                    }
+                } else {
+                    document.getElementById('comment-message').innerHTML = `<p class="text-red-500 font-medium">${data.message}</p>`; // Show error
+                }
+            })
+            .catch(error => {
+                document.getElementById('comment-message').innerHTML = '<p class="text-red-500 font-medium">Error submitting comment.</p>'; // Show error
+                console.error("Error:", error); // Log error
+            });
+        });
+    });
+
+    // Simulate live match updates
+    let homeGoals = 0; // Track home team goals
+    let awayGoals = 0; // Track away team goals
+    let score = '{{ match_data.home_score }} - {{ match_data.away_score }}'; // Initial score
+    let eventList = document.getElementById('match-events'); // Event list element
+    let scoreDisplay = document.getElementById('match-score'); // Score display element
+    let timerDisplay = document.getElementById('match-timer'); // Timer display element
+    let finalResultContainer = document.getElementById('final-result-container'); // Final result element
+    let i = 0; // Event counter
+
+    // Parse final result from backend or randomize
+    let finalResult = '{{ fixture.final_result|default:"0-0" }}'.split('-').map(Number);
+    let targetHomeGoals = finalResult[0] || Math.floor(Math.random() * 3); // Set home goals
+    let targetAwayGoals = finalResult[1] || Math.floor(Math.random() * 3); // Set away goals
+
+    // Non-goal events for match realism
+    const baseEvents = [
+        "Kick-off!", // Start of match
+        "Foul on {{ fixture.club.name|escapejs }} player.", // Foul event
+        "Corner for {{ fixture.opponent|escapejs }}.", // Corner event
+        "Yellow card for {{ fixture.opponent|escapejs }}.", // Yellow card
+        "Half-time", // Mid-match break
+        "Injury to {{ fixture.club.name|escapejs }} player." // Injury event
+    ];
+
+    // Generate goal events to match final result
+    let goalEvents = [];
+    for (let g = 0; g < targetHomeGoals; g++) {
+        goalEvents.push("⚽ Goal! {{ fixture.club.name|escapejs }} scores!"); // Home goals
+    }
+    for (let g = 0; g < targetAwayGoals; g++) {
+        goalEvents.push("⚽ Goal! {{ fixture.opponent|escapejs }} scores!"); // Away goals
+    }
+    goalEvents.sort(() => Math.random() - 0.5); // Shuffle goal events
+
+    // Construct events with controlled half-time
+    let events = [baseEvents[0]]; // Start with Kick-off
+    const totalGoalEvents = goalEvents.length; // Total goals
+    const halfTimeIndex = 4; // Fixed half-time position
+    const eventsPerHalf = Math.ceil((totalGoalEvents + baseEvents.length - 1) / 2); // Split events
+
+    // First half: add goals before half-time
+    for (let j = 0; j < eventsPerHalf - 1 && j < totalGoalEvents; j++) {
+        events.push(goalEvents[j]);
+    }
+    events.push(baseEvents[halfTimeIndex]); // Add Half-time
+
+    // Second half: add remaining goals
+    for (let j = eventsPerHalf - 1; j < totalGoalEvents; j++) {
+        events.push(goalEvents[j]);
+    }
+    events.push(baseEvents[baseEvents.length - 1]); // Add Injury
+    events.push("🏁 Full-time: " + '{{ fixture.final_result|default:"0-0" }}'); // Add final result
+
+    // Calculate event times for 90-minute match
+    const totalDuration = 30000; // 30-second simulation
+    const halfTimeMinute = 45; // Half-time at 45 minutes
+    const fullTimeMinute = 90; // Full-time at 90 minutes
+    let eventTimes = []; // Event timestamps
+
+    // Distribute times: kick-off at 0, half-time at 45, full-time at 90
+    const eventsBeforeHalf = events.indexOf("Half-time") + 1; // Events before half-time
+    const eventsAfterHalf = events.length - eventsBeforeHalf; // Events after half-time
+
+    // Scale first half events (0 -> 45)
+    for (let j = 0; j < eventsBeforeHalf; j++) {
+        eventTimes.push((j / (eventsBeforeHalf - 1)) * halfTimeMinute);
+    }
+    // Scale second half events (45 -> 90)
+    for (let j = 1; j <= eventsAfterHalf; j++) {
+        eventTimes.push(halfTimeMinute + (j / eventsAfterHalf) * (fullTimeMinute - halfTimeMinute));
+    }
+
+    const interval = totalDuration / (events.length - 1); // Time between events
+
+    // Run match simulation
+    const simulateMatch = setInterval(() => {
+        if (i >= events.length) { // Stop at end of events
+            clearInterval(simulateMatch); // End simulation
+            finalResultContainer.classList.remove('hidden'); // Show final result
+            finalResultContainer.querySelector('p').textContent = `Final Result: {{ fixture.final_result|default:"0-0" }}`; // Update final score
+            fetch('{% url "engagement:live_match" %}?simulation_ended=true', { // Notify backend simulation ended
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value // Include CSRF token
+                }
+            })
+            .catch(error => console.error('Error stopping simulation:', error)); // Log errors
+            return;
+        }
+
+        // Add event to commentary
+        eventList.innerHTML += `<li>${events[i]
+            .replace('{{ fixture.club.name|escapejs }}', '{{ fixture.club.name|escapejs }}')
+            .replace('{{ fixture.opponent|escapejs }}', '{{ fixture.opponent|escapejs }}')}</li>`;
+
+        // Update score for goals
+        if (events[i].includes('{{ fixture.club.name|escapejs }} scores')) {
+            homeGoals++; // Increment home goals
+            score = `${homeGoals}-${awayGoals}`; // Update score
+            scoreDisplay.textContent = score; // Display new score
+        } else if (events[i].includes('{{ fixture.opponent|escapejs }} scores')) {
+            awayGoals++; // Increment away goals
+            score = `${homeGoals}-${awayGoals}`; // Update score
+            scoreDisplay.textContent = score; // Display new score
+        }
+
+        // Update timer to match event time
+        const currentMinute = Math.floor(eventTimes[i]); // Get current minute
+        timerDisplay.textContent = `Time: ${currentMinute.toString().padStart(2, '0')}:00`; // Display time
+
+        i++; // Move to next event
+    }, interval);
+</script>
+{% endblock %}

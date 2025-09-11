@@ -1,0 +1,108 @@
+{% extends 'engagement/base.html' %}
+<!-- Use base.html for consistent header/footer across the app -->
+{% block title %}News - Fan Hub{% endblock %}
+<!-- Set page title for browser tab -->
+{% block content %}
+    <div class="p-6 bg-gray-800 min-h-screen">
+        <!-- Main container with dark background, full height -->
+        <h2 class="text-3xl font-bold text-white mb-6">Club News</h2>
+        <!-- Bold heading for news section -->
+
+        <!-- Club Switcher -->
+        {% if user_profile and user_profile.supported_clubs.all %}
+            <!-- Show club dropdown if user is logged in with clubs -->
+            <div class="mb-6">
+                <!-- Container for club switcher -->
+                <label class="block text-white mb-2">Switch Club:</label>
+                <!-- Label for dropdown -->
+                <select id="club-select" class="w-full p-2 bg-gray-700 rounded-lg text-white" onchange="switchClub()">
+                    <!-- Dropdown to switch active club, triggers JS -->
+                    {% for club in user_profile.supported_clubs.all %}
+                        <!-- List user's supported clubs -->
+                        <option value="{{ club.id }}" {% if club.id == user_profile.active_club.id %}selected{% endif %}>
+                            <!-- Club option, pre-select active club -->
+                            {{ club.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endif %}
+
+        <!-- News Articles -->
+        <div class="bg-gray-700 p-4 rounded-lg shadow-lg">
+            <!-- Container for news articles -->
+            {% if news_articles %}
+                <!-- Check if articles exist -->
+                {% for article in news_articles %}
+                    <!-- Loop through articles from backend -->
+                    <div class="mb-4 p-4 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors duration-200">
+                        <!-- Article card with hover effect -->
+                        <a href="{% url 'engagement:news_detail' article.id %}" class="text-xl font-bold text-yellow-500 hover:text-yellow-600 mb-2 block">{{ article.title }}</a>
+                        <!-- Link to article detail page -->
+                        <p class="text-gray-300 mb-2">Published: {{ article.published_date|date:"F d, Y" }}</p>
+                        <!-- Show article date in nice format -->
+                        <p class="text-white">{{ article.summary }}</p>
+                        <!-- Show article summary -->
+                    </div>
+                {% endfor %}
+            {% else %}
+                <!-- Message if no articles available -->
+                <p class="text-center text-white">No news articles available for this club.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Function to switch active club via AJAX
+        function switchClub() {
+            // Get selected club ID from dropdown
+            const clubSelect = document.getElementById('club-select');
+            const clubId = clubSelect.value;
+            // Send POST request to switch-club endpoint
+            fetch('/engagement/switch-club/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Include CSRF token for security
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ club_id: clubId })
+            })
+            // Handle response
+            .then(response => response.json())
+            .then(data => {
+                // Reload page if successful
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    // Show error if failed
+                    alert('Failed to switch club: ' + data.message);
+                }
+            })
+            // Log and alert on error
+            .catch(error => {
+                console.error('Switch club error:', error);
+                alert('An error occurred while switching clubs.');
+            });
+        }
+
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                // Split cookies into array
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    // Trim and check each cookie
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        // Extract and decode cookie value
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+{% endblock %}

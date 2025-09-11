@@ -1,0 +1,71 @@
+{% extends 'engagement/base.html' %}
+<!-- Use base.html for consistent header/footer across the app -->
+{% block title %}Challenges - Fan Hub{% endblock %}
+<!-- Set page title for browser tab -->
+{% block content %}
+    <div class="p-6 bg-gray-800 min-h-screen">
+        <!-- Main container with dark background, full height -->
+        <h2 class="text-3xl font-bold text-white mb-6">Challenges</h2>
+        <!-- Bold heading for challenges -->
+
+        {% if user_profile %}
+            <!-- Show content if user is logged in -->
+            <div class="bg-gray-700 p-4 rounded-lg shadow-lg mb-6">
+                <!-- Container for user progress -->
+                <h3 class="text-xl font-bold text-white mb-4">Your Progress</h3>
+                <!-- Heading for progress section -->
+                <p class="text-white">Total Points: {{ club_stats.points }}</p>
+                <!-- Display user's total points -->
+                <p class="text-white">Badges: {{ club_stats.badges|default:'None' }}</p>
+                <!-- Display user's badges, default to None -->
+                <a href="{% url 'engagement:fixtures' %}" class="text-yellow-500 hover:text-yellow-600 mt-2 inline-block">Make a Prediction (Select a Match)</a>
+                <!-- Link to fixtures for score prediction -->
+            </div>
+
+            <!-- Poll Section -->
+            <div class="bg-gray-700 p-4 rounded-lg shadow-lg mb-6">
+                <!-- Container for poll section -->
+                <h3 class="text-xl font-bold text-white mb-4">Take a Poll</h3>
+                <!-- Heading for poll -->
+                <p class="text-white">Cast your vote on the best performers!</p>
+                <!-- Prompt for poll -->
+                <a href="{% url 'engagement:polls' %}" class="mt-4 inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+                    <!-- Link to polls page with styled button -->
+                    Best Performers in the Last Game
+                </a>
+            </div>
+
+            <div class="bg-gray-700 p-4 rounded-lg shadow-lg">
+                <!-- Container for active challenges -->
+                <h3 class="text-xl font-bold text-white mb-4">Active Challenges</h3>
+                <!-- Heading for challenges -->
+                {% for challenge in challenges %}
+                    <!-- Loop through challenges -->
+                    <div class="mb-4 p-2 bg-gray-600 rounded-lg">
+                        <!-- Challenge card -->
+                        <p class="text-white">
+                            <strong>{{ challenge.name }}</strong>: {{ challenge.description }}
+                            <br>
+                            Progress: {{ challenge.progress }} / {{ challenge.target }}
+                            <!-- Display challenge details and progress -->
+                            {% if challenge.completed %}
+                                <!-- Show if challenge is completed -->
+                                <span class="text-green-500">Completed! (+{{ challenge.points }} points, {{ challenge.badge }} badge)</span>
+                                <!-- Display points and badge earned -->
+                            {% else %}
+                                <!-- Show if challenge is ongoing -->
+                                <span class="text-yellow-500">In Progress</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                {% empty %}
+                    <!-- Message if no challenges -->
+                    <p class="text-center text-white">No challenges available yet.</p>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Message for non-logged-in users -->
+            <p class="text-center text-white">Please log in to view challenges.</p>
+        {% endif %}
+    </div>
+{% endblock %}

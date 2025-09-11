@@ -1,0 +1,196 @@
+{% extends 'engagement/base.html' %}
+<!-- Use base.html for consistent header/footer across the app -->
+{% block title %}{{ article.title }} - Fan Hub{% endblock %}
+<!-- Set page title with article name for browser tab -->
+{% block content %}
+    <div class="p-6 bg-gray-800 min-h-screen">
+        <!-- Main container with dark background, full height -->
+        <h2 class="text-3xl font-bold text-white mb-6">News Detail</h2>
+        <!-- Bold heading for news detail section -->
+
+        <!-- Back to News Link -->
+        <a href="{% url 'engagement:news' %}" class="text-yellow-500 hover:text-yellow-600 mb-4 inline-block">&larr; Back to News</a>
+        <!-- Link to go back to news page -->
+
+        <!-- Article Details -->
+        <div class="bg-gray-700 p-4 rounded-lg shadow-lg mb-6">
+            <!-- Container for article details -->
+            <h3 class="text-2xl font-bold text-white mb-2">{{ article.title }}</h3>
+            <!-- Article title -->
+            <p class="text-gray-300 mb-2">Published: {{ article.published_date|date:"F d, Y" }}</p>
+            <!-- Show article date in nice format -->
+            {% if article.image %}
+                <!-- Show image if it exists -->
+                <img src="{{ article.image.url }}" alt="{{ article.title }}" class="w-full h-auto max-w-none mt-2 rounded-lg" style="max-height: 400px; object-fit: cover;">
+                <!-- Article image with fixed height and cover fit -->
+            {% endif %}
+            <p class="text-white mt-4">{{ article.summary }}</p>
+            <!-- Article summary -->
+            {% if article.content %}
+                <!-- Show full content if available -->
+                <div class="text-white mt-4">{{ article.content|linebreaks }}</div>
+                <!-- Format content with line breaks -->
+            {% endif %}
+        </div>
+
+        <!-- Comment Form -->
+        <div class="bg-gray-700 p-4 rounded-lg shadow-lg mb-6">
+            <!-- Container for comment form -->
+            <h3 class="text-xl font-bold text-white mb-4">Add a Comment</h3>
+            <!-- Heading for comment section -->
+            {% if messages %}
+                <!-- Check for backend messages -->
+                {% for message in messages %}
+                    <p class="text-{% if message.tags == 'error' %}red-500{% else %}green-500{% endif %} mb-2">{{ message }}</p>
+                    <!-- Show messages in red for errors, green for success -->
+                {% endfor %}
+            {% endif %}
+            <form id="comment-form" method="post" action="{% url 'engagement:news_detail' article.id %}">
+                <!-- Form to submit comment -->
+                {% csrf_token %}
+                <!-- Security token to prevent attacks -->
+                <div class="mb-4">
+                    <!-- Textarea for comment input -->
+                    <textarea name="comment" class="w-full p-2 bg-gray-600 rounded-lg text-white" rows="4" placeholder="Write your comment..." required></textarea>
+                </div>
+                <button type="submit" class="w-full p-2 bg-green-600 hover:bg-green-700 rounded-lg text-white">Submit Comment</button>
+                <!-- Green submit button with hover effect -->
+            </form>
+        </div>
+
+        <!-- Comments List -->
+        <div class="bg-gray-700 p-4 rounded-lg shadow-lg">
+            <!-- Container for comments -->
+            <h3 class="text-xl font-bold text-white mb-4">Comments</h3>
+            <!-- Heading for comments list -->
+            {% if comments %}
+                <!-- Check if comments exist -->
+                {% for comment in comments %}
+                    <!-- Loop through comments -->
+                    <div class="mb-4 p-2 bg-gray-600 rounded-lg">
+                        <!-- Comment card -->
+                        <p class="text-white flex items-center">
+                            <!-- Username and comment text -->
+                            <span class="text-yellow-500 mr-2">👤</span>
+                            <strong>{{ comment.user_profile.user.username }}</strong>: {{ comment.text }}
+                        </p>
+                        <p class="text-gray-400 text-sm">Posted: {{ comment.created_at|date:"F d, Y H:i" }}</p>
+                        <!-- Comment timestamp -->
+                        <div class="flex mt-2">
+                            <!-- Like/dislike buttons -->
+                            <button class="like-btn mr-4 text-green-500 hover:text-green-700" data-comment-id="{{ comment.id }}" data-action="like">Like ({{ comment.likes }})</button>
+                            <button class="dislike-btn text-red-500 hover:text-red-700" data-comment-id="{{ comment.id }}" data-action="dislike">Dislike ({{ comment.dislikes }})</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <!-- Message if no comments -->
+                <p class="text-center text-white">No comments yet. Be the first to comment!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Wait for page to load
+        document.addEventListener('DOMContentLoaded', function() {
+            const commentForm = document.getElementById('comment-form');
+            const likeButtons = document.querySelectorAll('.like-btn');
+            const dislikeButtons = document.querySelectorAll('.dislike-btn');
+
+            // Handle comment submission via AJAX
+            commentForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Stop normal form submission
+                const formData = new FormData(this); // Get form data
+                fetch(this.action, { // Send to same URL
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        location.reload(); // Reload to show new comment
+                    } else {
+                        alert(data.message); // Show error
+                    }
+                })
+                .catch(error => console.error('Error:', error)); // Log errors
+            });
+
+            // Handle like/dislike button clicks
+            [likeButtons, dislikeButtons].forEach(buttons => {
+                buttons.forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault(); // Stop default action
+                        const commentId = this.getAttribute('data-comment-id'); // Get comment ID
+                        const action = this.getAttribute('data-action'); // Get action (like/dislike)
+                        const otherAction = action === 'like' ? 'dislike' : 'like'; // Opposite action
+                        const otherButton = document.querySelector(`[data-action="${otherAction}"][data-comment-id="${commentId}"]`);
+                        const userActionKey = `comment_${commentId}_action`; // Local storage key
+
+                        // Track user action in local storage
+                        const currentAction = localStorage.getItem(userActionKey);
+                        let newLikes = parseInt(this.textContent.match(/\d+/) || 0);
+                        let newDislikes = parseInt(otherButton.textContent.match(/\d+/) || 0);
+
+                        if (currentAction === action) {
+                            // Undo action
+                            localStorage.removeItem(userActionKey);
+                            if (action === 'like') newLikes -= 1;
+                            else newDislikes -= 1;
+                            this.classList.remove(action === 'like' ? 'text-green-700' : 'text-red-700');
+                        } else {
+                            // Toggle action
+                            if (currentAction) {
+                                if (currentAction === 'like') newLikes -= 1;
+                                else newDislikes -= 1;
+                                otherButton.classList.remove(otherAction === 'like' ? 'text-green-700' : 'text-red-700');
+                            }
+                            localStorage.setItem(userActionKey, action);
+                            if (action === 'like') newLikes += 1;
+                            else newDislikes += 1;
+                            this.classList.add(action === 'like' ? 'text-green-700' : 'text-red-700');
+                        }
+
+                        // Update backend via AJAX
+                        fetch('{% url "engagement:news_detail" article.id %}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+                            },
+                            body: `action=${action}&comment_id=${commentId}`
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Update button text with new counts
+                            if (data.likes !== undefined && data.dislikes !== undefined) {
+                                this.textContent = `${action === 'like' ? 'Like' : 'Dislike'} (${data[action === 'like' ? 'likes' : 'dislikes']})`;
+                                otherButton.textContent = `${otherAction === 'like' ? 'Like' : 'Dislike'} (${data[otherAction === 'like' ? 'likes' : 'dislikes']})`;
+                            }
+                        })
+                        .catch(error => console.error('Error:', error)); // Log errors
+                    });
+                });
+            });
+
+            // Get CSRF token from cookies
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,269 @@
+{% extends 'engagement/base.html' %}
+<!-- Use base.html for consistent header/footer across the app -->
+{% block title %}Home - Fan Hub{% endblock %}
+<!-- Set page title for browser tab -->
+{% block content %}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Responsive grid layout for main content and stats -->
+        <div class="col-span-2 p-6 bg-gray-700 rounded-lg shadow-lg" id="main-content" style="background-color: {% if user_profile.active_club %}{{ user_profile.active_club.primary_color }}{% else %}#4a4a4a{% endif %};">
+            <!-- Main content with club-specific background color -->
+            <h2 class="text-2xl font-bold mb-4">Welcome, {{ user.username|default:'Guest' }}!</h2>
+            <!-- Welcome message with username or Guest -->
+            <div class="mb-4">
+                <!-- Container for club switcher -->
+                <label class="block mb-2">Active Club:</label>
+                <!-- Label for club buttons -->
+                <div class="flex space-x-2" id="club-buttons">
+                    <!-- Container for club buttons -->
+                    {% for club in user_profile.supported_clubs.all %}
+                        <!-- Loop through user's supported clubs -->
+                        <button class="px-4 py-2 rounded-lg {% if club == user_profile.active_club %}bg-{{ club.primary_color|cut:'#' }}-500 text-white border-2 border-white{% else %}bg-gray-500 text-white hover:bg-gray-600{% endif %} transition"
+                                onclick="switchClub('{{ club.id }}', '{{ club.primary_color }}')">
+                            <!-- Button to switch club, highlights active club -->
+                            {{ club.name }}
+                        </button>
+                    {% endfor %}
+                </div>
+            </div>
+            <p class="mb-2">Points: <span id="points" class="font-semibold">{{ club_points }}</span></p>
+            <!-- Display user's points -->
+            <p class="mb-4">Badges: <span id="badges" class="font-semibold">{% if club_badges != 'None' %}{{ club_badges }}{% endif %}</span></p>
+            <!-- Display user's badges -->
+            <div class="mb-4">
+                <!-- Container for topic selector -->
+                <label class="block mb-2">Select Topic:</label>
+                <!-- Label for topic dropdown -->
+                <select id="topic-select" class="w-full p-2 bg-gray-600 rounded-lg text-white" onchange="fetchComments()">
+                    <!-- Dropdown to filter comments by topic -->
+                    <option value="">All Topics</option>
+                    <!-- Option for all topics -->
+                    {% for topic in topics %}
+                        <!-- Loop through available topics -->
+                        <option value="{{ topic.id }}">{{ topic.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <textarea id="fan-comment" class="w-full p-2 mb-4 bg-gray-600 rounded-lg text-white" placeholder="Share your thoughts about {{ user_profile.active_club.name }}..."></textarea>
+            <!-- Textarea for new comments -->
+            <button onclick="submitComment()" class="bg-yellow-500 text-gray-900 px-4 py-2 rounded-lg hover:bg-yellow-600 transition">Submit Comment</button>
+            <!-- Yellow button to submit comment -->
+            <div id="sentiment-result" class="mt-2"></div>
+            <!-- Placeholder for sentiment feedback -->
+            <div id="nudge-message" class="mt-2 text-yellow-300"></div>
+            <!-- Placeholder for nudge messages -->
+
+            <!-- Comments Section -->
+            <div class="mt-6">
+                <!-- Container for comments -->
+                <h3 class="text-xl font-bold mb-4">Recent Comments</h3>
+                <!-- Heading for comments -->
+                <div class="h-40 overflow-y-auto custom-scrollbar">
+                    <!-- Scrollable comment list -->
+                    <ul id="comments-list" class="list-none p-0 space-y-4">
+                        <!-- List for comments -->
+                        {% for comment in comments %}
+                            <!-- Loop through comments -->
+                            <li class="p-4 bg-gray-600 rounded-lg flex items-start space-x-3 animate-fade-in">
+                                <!-- Comment item with animation -->
+                                <div class="w-6 h-6 bg-blue-400 clip-diamond flex-shrink-0"></div>
+                                <!-- Diamond-shaped avatar -->
+                                <div>
+                                    <strong class="text-blue-300">Anonymous</strong>
+                                    <!-- Anonymous username -->
+                                    <span class="text-gray-400 text-sm ml-2">({{ comment.created_at|date:"H:i d M" }})</span>
+                                    <!-- Comment timestamp -->
+                                    <p class="mt-1 text-gray-100">{{ comment.text }}</p>
+                                    <!-- Comment text -->
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {% if not comments %}
+                        <!-- Message if no comments -->
+                        <p class="text-gray-400 text-center py-2">No comments yet. Be the first to comment!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="p-6 bg-gray-700 rounded-lg shadow-lg" id="stats-section">
+            <!-- Stats sidebar -->
+            <h3 class="text-xl font-bold mb-4">Quick Stats</h3>
+            <!-- Heading for stats -->
+            <p>Comments: <span id="comment-count">{{ club_comment_count }}</span></p>
+            <!-- Display comment count -->
+            <p>Points: <span id="points-stat">{{ club_points }}</span></p>
+            <!-- Display points -->
+            <p>Badges Earned: <span id="badges-stat">{{ badges_count }}</span></p>
+            <!-- Display badge count -->
+        </div>
+    </div>
+    <script>
+        // Switch active club via AJAX
+        function switchClub(clubId, color) {
+            console.log('Switching to club ID:', clubId, 'with color:', color); // Log club switch
+            fetch('/engagement/switch-club/', { // Send to switch-club endpoint
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+                },
+                body: JSON.stringify({ club_id: clubId }) // Send club ID
+            })
+            .then(response => {
+                console.log('Response status:', response.status); // Log response
+                return response.json(); // Parse JSON
+            })
+            .then(data => {
+                if (data.status === 'success') { // Check if successful
+                    console.log('Switch successful, updating color to:', color); // Log success
+                    const mainContent = document.getElementById('main-content'); // Get main content
+                    if (mainContent) {
+                        mainContent.style.backgroundColor = color; // Update background
+                    }
+                    const buttons = document.querySelectorAll('#club-buttons button'); // Get all buttons
+                    buttons.forEach(btn => {
+                        const btnClubId = btn.getAttribute('onclick').match(/'([^']+)'/)[1]; // Extract club ID
+                        btn.className = btn.className.replace(/(bg-[^-\s]+-500|border-2 border-white)/g, ''); // Clear styles
+                        if (btnClubId === clubId) {
+                            btn.className += ` bg-${color.replace('#', '')}-500 border-2 border-white`; // Highlight active
+                        } else {
+                            btn.className += ' bg-gray-500'; // Dim others
+                        }
+                    });
+                    location.reload(); // Reload page
+                } else {
+                    console.error('Switch failed:', data); // Log error
+                }
+            })
+            .catch(error => console.error('Fetch error:', error)); // Log fetch error
+        }
+
+        // Submit comment with sentiment analysis
+        function submitComment() {
+            const comment = document.getElementById('fan-comment').value; // Get comment text
+            const topicId = document.getElementById('topic-select').value; // Get topic ID
+            if (comment.trim() && '{{ user.username }}' !== 'Guest') { // Check for text and logged-in user
+                fetch('/engagement/api/analyze-sentiment/', { // Send to sentiment API
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+                    },
+                    body: JSON.stringify({ comment, topic_id: topicId }) // Send comment and topic
+                })
+                .then(response => response.json()) // Parse response
+                .then(data => {
+                    document.getElementById('sentiment-result').innerText = `Sentiment: ${data.sentiment}`; // Show sentiment
+                    if (data.sentiment === 'Positive') { // Handle positive comment
+                        let points = parseInt(document.getElementById('points').innerText) + 10; // Add 10 points
+                        document.getElementById('points').innerText = points; // Update points
+                        document.getElementById('nudge-message').innerText = 'Great comment! Keep supporting {{ user_profile.active_club.name }}!'; // Positive nudge
+                    } else if (data.sentiment === 'Negative') { // Handle negative comment
+                        document.getElementById('nudge-message').innerText = 'Let’s keep it positive for {{ user_profile.active_club.name }}!'; // Negative nudge
+                    }
+                    // Add new comment to list
+                    const commentsList = document.getElementById('comments-list'); // Get comment list
+                    const li = document.createElement('li'); // Create new comment
+                    li.className = 'p-4 bg-gray-600 rounded-lg flex items-start space-x-3 animate-fade-in';
+                    li.innerHTML = `
+                        <div class="w-6 h-6 bg-blue-400 clip-diamond flex-shrink-0"></div>
+                        <div>
+                            <strong class="text-blue-300">Anonymous</strong>
+                            <span class="text-gray-400 text-sm ml-2">(Just now)</span>
+                            <p class="mt-1 text-gray-100">${comment}</p>
+                        </div>`;
+                    commentsList.insertBefore(li, commentsList.firstChild); // Add to top
+                    if (commentsList.querySelector('p.text-gray-400')) { // Remove no-comments message
+                        commentsList.querySelector('p.text-gray-400').remove();
+                    }
+                    // Update stats and comments
+                    updateStats(); // Fetch updated stats
+                    fetchComments(); // Refresh comment list
+                    document.getElementById('fan-comment').value = ''; // Clear textarea
+                })
+                .catch(error => console.error('Error:', error)); // Log error
+            }
+        }
+
+        // Update stats via AJAX
+        function updateStats() {
+            fetch('/engagement/api/update-stats/', { // Send to stats API
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+                }
+            })
+            .then(response => response.json()) // Parse response
+            .then(data => {
+                document.getElementById('comment-count').innerText = data.comment_count; // Update comment count
+                document.getElementById('points-stat').innerText = data.points; // Update points
+                document.getElementById('badges-stat').innerText = data.badges_count; // Update badges
+                fetch('/engagement/api/get-badges/', { // Fetch badges
+                    method: 'GET',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+                    }
+                })
+                .then(response => response.json()) // Parse response
+                .then(badgesData => {
+                    document.getElementById('badges').innerText = badgesData.badges || ''; // Update badges
+                });
+            });
+        }
+
+        // Fetch comments for selected topic
+        function fetchComments() {
+            const topicId = document.getElementById('topic-select').value; // Get topic ID
+            fetch(`/engagement/api/get-comments/?topic_id=${topicId}`, { // Send to comments API
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+                }
+            })
+            .then(response => response.json()) // Parse response
+            .then(data => {
+                const commentsList = document.getElementById('comments-list'); // Get comment list
+                commentsList.innerHTML = ''; // Clear current comments
+                if (data.comments.length > 0) { // Check for comments
+                    data.comments.forEach(comment => { // Loop through comments
+                        const li = document.createElement('li');
+                        li.className = 'p-4 bg-gray-600 rounded-lg flex items-start space-x-3';
+                        li.innerHTML = `
+                            <div class="w-6 h-6 bg-blue-400 clip-diamond flex-shrink-0"></div>
+                            <div>
+                                <strong class="text-blue-300">Anonymous</strong>
+                                <span class="text-gray-400 text-sm ml-2">(${comment.created_at})</span>
+                                <p class="mt-1 text-gray-100">${comment.text}</p>
+                            </div>`;
+                        commentsList.appendChild(li); // Add comment
+                    });
+                } else {
+                    commentsList.innerHTML = '<p class="text-gray-400 text-center py-2">No comments yet. Be the first to comment!</p>'; // Show no-comments message
+                }
+            })
+            .catch(error => console.error('Error fetching comments:', error)); // Log error
+        }
+
+        // Get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';'); // Split cookies
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim(); // Trim cookie
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1)); // Decode value
+                        break;
+                    }
+                }
+            }
+            return cookieValue; // Return token
+        }
+
+        // Load stats and comments on page load
+        window.onload = function() {
+            updateStats(); // Fetch initial stats
+            fetchComments(); // Fetch initial comments
+        };
+    </script>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'engagement/base.html' %}
+<!-- Use base.html for consistent header/footer across the app -->
+{% block title %}Fixtures - Fan Hub{% endblock %}
+<!-- Set page title for browser tab -->
+{% block content %}
+    <div class="p-6 bg-gray-800 min-h-screen">
+        <!-- Main container with dark background, full height -->
+        <h2 class="text-3xl font-bold text-white mb-6">Fixtures</h2>
+        <!-- Bold heading for fixtures -->
+
+        {% if user_profile %}
+            <!-- Show content if user is logged in -->
+            <!-- Club Switching Dropdown -->
+            <div class="bg-gray-700 p-4 rounded-lg shadow-lg mb-6">
+                <!-- Container for club switcher -->
+                <h3 class="text-xl font-bold text-white mb-4">Select Your Club</h3>
+                <!-- Heading for club selection -->
+                <select id="club-switch" class="w-full p-2 bg-gray-600 rounded-lg text-white">
+                    <!-- Dropdown to switch active club -->
+                    {% for club in user_profile.supported_clubs.all %}
+                        <!-- Loop through user's supported clubs -->
+                        <option value="{{ club.id }}" {% if club == user_profile.active_club %}selected{% endif %}>
+                            <!-- Club option, pre-select active club -->
+                            {{ club.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="bg-gray-700 p-4 rounded-lg shadow-lg">
+                <!-- Container for upcoming matches -->
+                <h3 class="text-xl font-bold text-white mb-4">Upcoming Matches</h3>
+                <!-- Heading for fixtures -->
+                {% for fixture in fixtures %}
+                    <!-- Loop through fixtures -->
+                    <div class="mb-4 p-2 bg-gray-600 rounded-lg {% if fixture.is_live %}border-2 border-red-500{% endif %}">
+                        <!-- Fixture card, highlight live matches -->
+                        <p class="text-white">
+                            {{ fixture.club.name }} vs {{ fixture.opponent }} - {{ fixture.date|date:'Y-m-d' }} at {{ fixture.time }}
+                            <!-- Display match details -->
+                            {% if fixture.is_live %}
+                                <!-- Show if match is live -->
+                                <span class="text-red-500 font-semibold ml-2">LIVE NOW</span>
+                                <!-- Highlight live status -->
+                                <a href="{% url 'engagement:live_match' %}" class="text-red-500 hover:text-red-600 ml-2">Watch Live</a>
+                                <!-- Link to live match page -->
+                            {% elif fixture.final_result %}
+                                <!-- Show if match has ended -->
+                                <span class="text-green-500 ml-2">Final: {{ fixture.final_result }}</span>
+                                <!-- Display final score -->
+                            {% else %}
+                                <!-- Show for upcoming matches -->
+                                <a href="{% url 'engagement:challenges_predict' fixture.id %}" class="text-yellow-500 hover:text-yellow-600 ml-2">Predict Score</a>
+                                <!-- Link to predict score -->
+                            {% endif %}
+                            {% if fixture.notes %}
+                                <!-- Show additional notes if available -->
+                                <span class="text-gray-400 ml-2">{{ fixture.notes }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                {% endfor %}
+                {% if not fixtures %}
+                    <!-- Message if no fixtures -->
+                    <p class="text-white">No fixtures available. Contact an admin to add matches.</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <!-- Message for non-logged-in users -->
+            <p class="text-center text-white">Please log in to view fixtures.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        // Wait for page to load
+        document.addEventListener('DOMContentLoaded', function() {
+            const select = document.getElementById('club-switch'); // Get club dropdown
+
+            // Handle club switch
+            select.addEventListener('change', function(e) {
+                const clubId = e.target.value; // Get selected club ID
+                fetch('{% url "engagement:switch_club" %}', { // Send to switch-club endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded', // Use form encoding
+                        'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+                    },
+                    body: `club_id=${clubId}` // Send club ID
+                })
+                .then(response => response.json()) // Parse response
+                .then(data => {
+                    if (data.status === 'success') { // Check if successful
+                        location.reload(); // Reload to update fixtures
+                    } else {
+                        alert(data.message); // Show error message
+                    }
+                })
+                .catch(error => console.error('Error:', error)); // Log error
+            });
+
+            // Get CSRF token from cookies
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';'); // Split cookies
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim(); // Trim cookie
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1)); // Decode value
+                            break;
+                        }
+                    }
+                }
+                return cookieValue; // Return token
+            }
+        });
+    </script>
+{% endblock %}

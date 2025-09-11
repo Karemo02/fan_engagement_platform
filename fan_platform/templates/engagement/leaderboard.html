@@ -1,0 +1,326 @@
+{% extends 'engagement/base.html' %}
+<!-- Use base.html for consistent header/footer across the app -->
+{% block title %}Leaderboard - Fan Hub{% endblock %}
+<!-- Set page title for browser tab -->
+{% block content %}
+    <div class="p-6 bg-gray-800 min-h-screen">
+        <!-- Main container with dark background, full height -->
+        <h2 class="text-3xl font-bold text-white mb-6">Leaderboard</h2>
+        <!-- Bold heading for leaderboard -->
+
+        <!-- Club Switcher -->
+        {% if user_profile and user_profile.supported_clubs.all %}
+            <!-- Show club dropdown if user is logged in with clubs -->
+            <div class="mb-6">
+                <!-- Container for club switcher -->
+                <label class="block text-white mb-2">Switch Club:</label>
+                <!-- Label for dropdown -->
+                <select id="club-select" class="w-full p-2 bg-gray-700 rounded-lg text-white" onchange="switchClub()">
+                    <!-- Dropdown to switch active club, triggers JS -->
+                    {% for club in user_profile.supported_clubs.all %}
+                        <!-- List user's supported clubs -->
+                        <option value="{{ club.id }}" {% if club.id == user_profile.active_club.id %}selected{% endif %}>
+                            <!-- Club option, pre-select active club -->
+                            {{ club.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endif %}
+
+        <!-- Leaderboard View Selector -->
+        <div class="mb-6">
+            <!-- Container for leaderboard type dropdown -->
+            <label class="block text-white mb-2">View:</label>
+            <!-- Label for view selector -->
+            <select id="leaderboard-type" class="w-full p-2 bg-gray-700 rounded-lg text-white" onchange="fetchLeaderboard()">
+                <!-- Dropdown to choose leaderboard type -->
+                <option value="global">Global</option>
+                <!-- Global leaderboard option -->
+                <option value="club">Club-Specific</option>
+                <!-- Club-specific leaderboard option -->
+                {% if topics and topics|length > 0 %}
+                    <!-- Show topic option if topics exist -->
+                    <option value="topic">Topic-Specific</option>
+                {% endif %}
+            </select>
+            {% if topics and topics|length > 0 %}
+                <!-- Show topic dropdown if topics exist -->
+                <select id="topic-select" class="w-full p-2 mt-2 bg-gray-700 rounded-lg text-white" style="display: none;">
+                    <!-- Dropdown for topic selection, hidden by default -->
+                    {% for topic in topics %}
+                        <!-- List available topics -->
+                        <option value="{{ topic.id }}">{{ topic.name }}</option>
+                    {% endfor %}
+                </select>
+            {% endif %}
+        </div>
+
+        <!-- Leaderboard Content -->
+        <div id="leaderboard-content" class="bg-gray-700 p-4 rounded-lg shadow-lg mb-6">
+            <!-- Container for dynamic leaderboard data -->
+            <p class="text-center text-white">Loading...</p>
+            <!-- Initial loading message -->
+        </div>
+
+        <!-- Points Over Time Chart -->
+        <div class="bg-gray-700 p-4 rounded-lg shadow-lg">
+            <!-- Container for chart -->
+            <h3 class="text-xl font-bold text-white mb-4">Points Over Time</h3>
+            <!-- Heading for chart -->
+            <div class="chart-container" style="position: relative; height: 300px; width: 100%; max-width: 700px; margin: 0 auto;">
+                <!-- Chart wrapper with fixed size -->
+                <canvas id="pointsChart"></canvas>
+                <!-- Canvas for Chart.js -->
+                <div id="no-data-message" class="absolute inset-0 flex items-center justify-center text-white text-center" style="display: none;">
+                    <!-- Message if no chart data -->
+                    No data available for this topic
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Load Chart.js for points chart -->
+    <script>
+        // Store chart instance for updates
+        let myChart;
+
+        // Fetch and display leaderboard data
+        function fetchLeaderboard() {
+            const type = document.getElementById('leaderboard-type').value; // Get selected leaderboard type
+            const topicSelect = document.getElementById('topic-select'); // Get topic dropdown
+            const content = document.getElementById('leaderboard-content'); // Get content container
+            content.innerHTML = '<div class="flex justify-center"><div class="animate-spin h-5 w-5 border-2 border-t-white border-gray-500 rounded-full"></div></div>'; // Show spinner while loading
+            let url = '/engagement/api/get-leaderboard-data/'; // Base API URL
+            let topicId = null; // Track topic ID for topic-specific view
+
+            // Handle topic-specific leaderboard
+            if (type === 'topic' && topicSelect) {
+                topicId = topicSelect.value; // Get selected topic ID
+                if (!topicId && '{{ topics|length }}' > 0) { // Use first topic if none selected
+                    topicId = '{{ topics.0.id|default:""|escapejs }}';
+                    if (topicId) url += `?topic_id=${topicId}`; // Add topic ID to URL
+                } else if (topicId) {
+                    url += `?topic_id=${topicId}`; // Add topic ID to URL
+                }
+                topicSelect.style.display = 'block'; // Show topic dropdown
+            } else if (topicSelect) {
+                topicSelect.style.display = 'none'; // Hide topic dropdown
+            }
+
+            // Fetch leaderboard data via AJAX
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken') // Include CSRF token for security
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`); // Check for errors
+                return response.json(); // Parse JSON response
+            })
+            .then(data => {
+                content.innerHTML = ''; // Clear content
+                let title = ''; // Set leaderboard title
+                let leaderboardData = data[type] || []; // Get data for selected type
+
+                // Set title based on type
+                if (type === 'global') {
+                    title = 'Global Leaderboard';
+                } else if (type === 'club') {
+                    title = `Club-Specific Leaderboard ({{ user_profile.active_club.name|escapejs }})`;
+                    leaderboardData = data.club || []; // Use club data
+                } else if (type === 'topic' && topicId) {
+                    const selectedTopicName = topicSelect.options[topicSelect.selectedIndex].text || '{{ topics.0.name|default:"Unknown Topic"|escapejs }}';
+                    title = `Topic-Specific Leaderboard (${selectedTopicName})`; // Use topic name
+                }
+
+                // Add title to content
+                const h3 = document.createElement('h3');
+                h3.className = 'text-xl font-bold text-white mb-4';
+                h3.textContent = title;
+                content.appendChild(h3);
+
+                // Build leaderboard list
+                const ul = document.createElement('ul');
+                ul.className = 'space-y-2';
+                if (leaderboardData.length > 0) {
+                    leaderboardData.forEach((item, index) => { // Loop through leaderboard data
+                        const li = document.createElement('li');
+                        li.className = 'flex justify-between items-center p-3 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors duration-200';
+                        li.innerHTML = `
+                            <span class="text-white">${index + 1}. ${item.user__username || 'Unknown User'}</span>
+                            <span class="text-green-300 font-semibold">${item[type === 'global' ? 'total_points' : type === 'club' ? 'club_points' : 'topic_points'] || 0} points</span>
+                        `; // Show rank, username, and points
+                        ul.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement('li');
+                    li.className = 'text-center text-white p-3';
+                    li.textContent = 'No data available'; // Show if no data
+                    ul.appendChild(li);
+                }
+                content.appendChild(ul);
+
+                // Update chart with new data
+                updateChart(type, topicId, data);
+            })
+            .catch(error => {
+                content.innerHTML = `<p class="text-red-500 text-center p-3">Error loading leaderboard: ${error.message}. Please try again.</p>`; // Show error
+                console.error('Fetch error:', error); // Log error
+            });
+        }
+
+        // Switch active club via AJAX
+        function switchClub() {
+            const clubSelect = document.getElementById('club-select'); // Get club dropdown
+            const clubId = clubSelect.value; // Get selected club ID
+            fetch('/engagement/switch-club/', { // Send to switch-club endpoint
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+                },
+                body: JSON.stringify({ club_id: clubId }) // Send club ID
+            })
+            .then(response => response.json()) // Parse response
+            .then(data => {
+                if (data.status === 'success') { // Check if successful
+                    location.reload(); // Reload page
+                } else {
+                    alert('Failed to switch club: ' + data.message); // Show error
+                }
+            })
+            .catch(error => {
+                console.error('Switch club error:', error); // Log error
+                alert('An error occurred while switching clubs.'); // Show error
+            });
+        }
+
+        // Get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';'); // Split cookies
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim(); // Trim cookie
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1)); // Decode value
+                        break;
+                    }
+                }
+            }
+            return cookieValue; // Return token
+        }
+
+        // Update points-over-time chart
+        function updateChart(type, topicId, apiData) {
+            let pointsData; // Data for chart
+            if (type === 'global') {
+                pointsData = {{ global_points_data|safe }}; // Use global data
+            } else {
+                pointsData = {{ club_points_data|safe }}; // Use club data
+            }
+            let filteredData = pointsData; // Filter data for chart
+
+            // Filter for topic-specific points
+            if (type === 'topic' && topicId) {
+                filteredData = pointsData.filter(data => data.topic_id === parseInt(topicId)); // Filter by topic ID
+            } else if (type === 'club') {
+                filteredData = pointsData; // Use all club data
+            }
+
+            const labels = filteredData.map(data => data.date); // X-axis dates
+            const points = filteredData.map(data => data.points); // Y-axis points
+
+            const noDataMessage = document.getElementById('no-data-message'); // No-data message element
+            if (labels.length === 0 || points.length === 0) { // Check for empty data
+                if (myChart) myChart.destroy(); // Clear old chart
+                document.getElementById('pointsChart').style.display = 'none'; // Hide canvas
+                noDataMessage.style.display = 'flex'; // Show no-data message
+                return;
+            } else {
+                document.getElementById('pointsChart').style.display = 'block'; // Show canvas
+                noDataMessage.style.display = 'none'; // Hide no-data message
+            }
+
+            if (myChart) {
+                myChart.destroy(); // Clear old chart
+            }
+
+            // Create new Chart.js line chart
+            const ctx = document.getElementById('pointsChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'line', // Line chart type
+                data: {
+                    labels: labels, // Set dates
+                    datasets: [{
+                        label: 'Points Over Time', // Chart label
+                        data: points, // Set points
+                        borderColor: '#4ade80', // Green line
+                        backgroundColor: 'rgba(74, 222, 128, 0.3)', // Fill color
+                        fill: true, // Fill under line
+                        tension: 0.1, // Smooth line
+                        pointRadius: 5, // Point size
+                        pointBackgroundColor: '#10b981' // Point color
+                    }]
+                },
+                options: {
+                    responsive: true, // Adapt to container
+                    maintainAspectRatio: false, // Allow custom aspect
+                    aspectRatio: 1.5, // Chart ratio
+                    scales: {
+                        x: { // X-axis settings
+                            title: {
+                                display: true,
+                                text: 'Date',
+                                font: { size: 14, weight: 'bold', color: '#ffffff' }
+                            },
+                            ticks: { font: { size: 12, color: '#ffffff' } },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: { // Y-axis settings
+                            title: {
+                                display: true,
+                                text: 'Points',
+                                font: { size: 14, weight: 'bold', color: '#ffffff' }
+                            },
+                            beginAtZero: true, // Start at 0
+                            ticks: { font: { size: 12, color: '#ffffff' } },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { // Legend settings
+                            labels: {
+                                font: { size: 14, color: '#ffffff' }
+                            }
+                        },
+                        tooltip: { // Tooltip settings
+                            backgroundColor: '#374151',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#4ade80',
+                            borderWidth: 1
+                        }
+                    }
+                }
+            });
+        }
+
+        // Set up event listeners
+        document.getElementById('leaderboard-type').addEventListener('change', function() { // Handle view change
+            if (this.value === 'topic' && document.getElementById('topic-select')) {
+                document.getElementById('topic-select').style.display = 'block'; // Show topic dropdown
+                document.getElementById('topic-select').addEventListener('change', fetchLeaderboard); // Add topic change listener
+            } else if (document.getElementById('topic-select')) {
+                document.getElementById('topic-select').style.display = 'none'; // Hide topic dropdown
+            }
+            fetchLeaderboard(); // Fetch new data
+        });
+
+        // Load leaderboard on page load
+        window.onload = fetchLeaderboard;
+    </script>
+{% endblock %}
