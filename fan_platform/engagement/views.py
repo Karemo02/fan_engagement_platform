@@ -81,37 +81,36 @@ def home(request):
     })
 
 @login_required
-def leaderboard(request):
-    # Render leaderboard with points data
-    user_profile = get_or_create_user_profile(request)
-    topics = Topic.objects.filter(club=user_profile.active_club) if user_profile and user_profile.active_club else []
-    if user_profile and user_profile.active_club and not topics.exists():
+def leaderboard(request):  # Render leaderboard with points data
+    user_profile = get_or_create_user_profile(request)  # Get user profile
+    topics = Topic.objects.filter(club=user_profile.active_club) if user_profile and user_profile.active_club else []  # Get topics
+    if user_profile and user_profile.active_club and not topics.exists():  # Create default topics if none
         topics = [Topic.objects.create(club=user_profile.active_club, name='Match Reviews'),
                   Topic.objects.create(club=user_profile.active_club, name='Player Discussions'),
                   Topic.objects.create(club=user_profile.active_club, name='Fan Predictions')]
     
-    club_points_data = []
-    if user_profile and user_profile.active_club:
-        comments = user_profile.comment_set.filter(club=user_profile.active_club, sentiment='Positive').order_by('created_at')
-        total_points = 0
-        for comment in comments:
-            total_points += 10
+    club_points_data = []  # Initialize club points data
+    if user_profile and user_profile.active_club:  # Check active club
+        comments = user_profile.comment_set.filter(club=user_profile.active_club, sentiment='Positive').order_by('created_at')  # Get positive comments
+        total_points = 0  # Track points
+        for comment in comments:  # Process comments
+            total_points += 10  # Add points
             club_points_data.append({
-                'date': comment.created_at.strftime('%Y-%m-%d'),
-                'points': total_points,
-                'topic_id': comment.topic.id if comment.topic else None
+                'date': comment.created_at.strftime('%Y-%m-%d') if comment.created_at else 'Unknown',  # Handle null date
+                'points': total_points,  # Set points
+                'topic_id': comment.topic.id if comment.topic else 0  # Use 0 for null topic
             })
     
-    global_points_data = []
-    if user_profile:
-        comments = user_profile.comment_set.filter(sentiment='Positive').order_by('created_at')
-        total_points = 0
-        for comment in comments:
-            total_points += 10
+    global_points_data = []  # Initialize global points data
+    if user_profile:  # Check user profile
+        comments = user_profile.comment_set.filter(sentiment='Positive').order_by('created_at')  # Get positive comments
+        total_points = 0  # Track points
+        for comment in comments:  # Process comments
+            total_points += 10  # Add points
             global_points_data.append({
-                'date': comment.created_at.strftime('%Y-%m-%d'),
-                'points': total_points,
-                'topic_id': comment.topic.id if comment.topic else None
+                'date': comment.created_at.strftime('%Y-%m-%d') if comment.created_at else 'Unknown',  # Handle null date
+                'points': total_points,  # Set points
+                'topic_id': comment.topic.id if comment.topic else 0  # Use 0 for null topic
             })
     
     return render(request, 'engagement/leaderboard.html', {
@@ -119,7 +118,7 @@ def leaderboard(request):
         'topics': topics,
         'club_points_data': club_points_data,
         'global_points_data': global_points_data
-    })
+    })  # Render template
 
 @login_required
 def news(request):
@@ -402,44 +401,64 @@ def fixtures(request):
     })
 
 @login_required
-def get_leaderboard_data(request):
-    # Fetch leaderboard data
-    user_profile = get_or_create_user_profile(request)
-    data = {}
+def get_leaderboard_data(request):  # Fetch leaderboard data
+    user_profile = get_or_create_user_profile(request)  # Get user profile
+    data = {}  # Initialize response data
     
     try:
-        data['global'] = list(UserProfile.objects.annotate(
-            total_points=Sum('club_stats__points', default=0)
-        ).values('user__username', 'total_points').order_by('-total_points')[:10])
-        logger.debug(f"Global leaderboard data: {data['global']}")
+        data['global'] = [
+            {
+                'username': user['user__username'],  # Use username
+                'total_points': user['total_points'] or 0,  # Handle None points
+                'badges': ClubStats.objects.filter(user_profile__user__username=user['user__username']).first().badges.split(', ') if ClubStats.objects.filter(user_profile__user__username=user['user__username']).first() and ClubStats.objects.filter(user_profile__user__username=user['user__username']).first().badges else []  # Handle None badges
+            }
+            for user in UserProfile.objects.annotate(
+                total_points=Sum('club_stats__points', default=0)
+            ).values('user__username', 'total_points').order_by('-total_points')[:10]
+        ]
+        logger.debug(f"Global leaderboard data: {data['global']}")  # Log global data
 
-        if user_profile and user_profile.active_club:
-            data['club'] = list(UserProfile.objects.annotate(
-                club_points=Sum('club_stats__points', filter=Q(club_stats__club=user_profile.active_club), default=0)
-            ).values('user__username', 'club_points').order_by('-club_points')[:10])
+        if user_profile and user_profile.active_club:  # Check active club
+            data['club'] = [
+                {
+                    'username': user['user__username'],  # Use username
+                    'club_points': user['club_points'] or 0,  # Handle None points
+                    'badges': ClubStats.objects.filter(user_profile__user__username=user['user__username'], club=user_profile.active_club).first().badges.split(', ') if ClubStats.objects.filter(user_profile__user__username=user['user__username'], club=user_profile.active_club).first() and ClubStats.objects.filter(user_profile__user__username=user['user__username'], club=user_profile.active_club).first().badges else []  # Handle None badges
+                }
+                for user in UserProfile.objects.annotate(
+                    club_points=Sum('club_stats__points', filter=Q(club_stats__club=user_profile.active_club), default=0)
+                ).values('user__username', 'club_points').order_by('-club_points')[:10]
+            ]
         else:
-            data['club'] = []
-        logger.debug(f"Club-specific leaderboard data: {data['club']}")
+            data['club'] = []  # Empty club leaderboard
+        logger.debug(f"Club-specific leaderboard data: {data['club']}")  # Log club data
 
-        topic_id = request.GET.get('topic_id')
-        if user_profile and user_profile.active_club and topic_id:
+        topic_id = request.GET.get('topic_id')  # Get topic ID
+        if user_profile and user_profile.active_club and topic_id:  # Check topic
             try:
-                topic = get_object_or_404(Topic, id=topic_id, club=user_profile.active_club)
-                data['topic'] = list(UserProfile.objects.annotate(
-                    topic_points=Count('comment', filter=Q(comment__club=user_profile.active_club, comment__topic=topic), distinct=True) * 10
-                ).values('user__username', 'topic_points').order_by('-topic_points')[:10])
-                logger.debug(f"Topic-specific leaderboard data for topic {topic_id}: {data['topic']}")
-            except Topic.DoesNotExist:
-                data['topic'] = []
+                topic = get_object_or_404(Topic, id=topic_id, club=user_profile.active_club)  # Get topic
+                data['topic'] = [
+                    {
+                        'username': user['user__username'],  # Use username
+                        'topic_points': user['topic_points'] or 0,  # Handle None points
+                        'badges': ClubStats.objects.filter(user_profile__user__username=user['user__username'], club=user_profile.active_club).first().badges.split(', ') if ClubStats.objects.filter(user_profile__user__username=user['user__username'], club=user_profile.active_club).first() and ClubStats.objects.filter(user_profile__user__username=user['user__username'], club=user_profile.active_club).first().badges else []  # Handle None badges
+                    }
+                    for user in UserProfile.objects.annotate(
+                        topic_points=Count('comment', filter=Q(comment__club=user_profile.active_club, comment__topic=topic, comment__sentiment='Positive'), distinct=True) * 10  # Filter positive comments
+                    ).values('user__username', 'topic_points').order_by('-topic_points')[:10]
+                ]
+                logger.debug(f"Topic-specific leaderboard data for topic {topic_id}: {data['topic']}")  # Log topic data
+            except Topic.DoesNotExist:  # Handle missing topic
+                data['topic'] = []  # Empty topic leaderboard
         else:
-            data['topic'] = []
-        logger.debug(f"Final leaderboard data: {data}")
+            data['topic'] = []  # Empty topic leaderboard
+        logger.debug(f"Final leaderboard data: {data}")  # Log final data
 
-        return JsonResponse(data)
+        return JsonResponse(data)  # Return JSON response
 
-    except Exception as e:
-        logger.error(f"Error in get_leaderboard_data: {str(e)}")
-        return JsonResponse({'error': str(e)}, status=500)
+    except Exception as e:  # Catch errors
+        logger.error(f"Error in get_leaderboard_data: {str(e)}")  # Log error
+        return JsonResponse({'error': str(e)}, status=500)  # Return error
 
 @login_required
 def reset_stats(request):
@@ -477,72 +496,73 @@ def switch_club(request):
             return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
 
-def analyze_sentiment(request):
-    # Analyze comment sentiment
-    if request.method == 'POST':
-        user_profile = get_or_create_user_profile(request)
-        if not user_profile:
-            return JsonResponse({'error': 'Please log in to submit comments.'}, status=401)
-        data = json.loads(request.body)
-        comment = data.get('comment', '')
-        topic_id = data.get('topic_id')
-        topic = Topic.objects.get(id=topic_id) if topic_id else None
-        scores = sia.polarity_scores(comment)
-        sentiment = 'Neutral'
-        if scores['compound'] >= 0.05:
-            sentiment = 'Positive'
-        elif scores['compound'] <= -0.05:
-            sentiment = 'Negative'
-        
-        club = user_profile.active_club
-        comment_obj = Comment.objects.create(
-            user_profile=user_profile,
-            text=comment,
-            sentiment=sentiment,
-            club=club,
-            topic=topic
-        )
-        club_stats, created = ClubStats.objects.get_or_create(user_profile=user_profile, club=club)
-        if sentiment == 'Positive':
-            club_stats.points += 10
-            badges = club_stats.badges.split(', ') if club_stats.badges != 'None' else []
-            if 'Positive Fan' not in badges:
-                badges.append('Positive Fan')
-                club_stats.badges = ', '.join(badges) if badges else 'None'
-            comment_count = user_profile.comment_set.filter(club=club).count()
-            if comment_count >= 10 and 'Dedicated Fan' not in badges:
-                badges.append('Dedicated Fan')
-                club_stats.badges = ', '.join(badges) if badges else 'None'
-            if comment_count >= 20 and 'Loyal Supporters' not in badges:
-                badges.append('Loyal Supporters')
-                club_stats.badges = ', '.join(badges) if badges else 'None'
-            if topic and user_profile.comment_set.filter(club=club, topic=topic).count() >= 10 and 'Topic Expert' not in badges:
-                badges.append('Topic Expert')
-                club_stats.badges = ', '.join(badges) if badges else 'None'
-            club_stats.save()
-        return JsonResponse({'sentiment': sentiment})
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+def analyze_sentiment(request):  # Analyze comment sentiment
+      if request.method == 'POST':  # Check POST request
+          user_profile = get_or_create_user_profile(request)  # Get user profile
+          if not user_profile:  # Check authentication
+              return JsonResponse({'error': 'Please log in to submit comments.'}, status=401)  # Return error
+          data = json.loads(request.body)  # Parse JSON data
+          comment = data.get('comment', '')  # Get comment text
+          topic_id = data.get('topic_id')  # Get topic ID
+          if topic_id:  # Check topic ID
+              topic = Topic.objects.get(id=topic_id)  # Get topic
+          else:  # Use default topic
+              topic, _ = Topic.objects.get_or_create(club=user_profile.active_club, name='General')  # Create default topic
+          scores = sia.polarity_scores(comment)  # Analyze sentiment
+          sentiment = 'Neutral'  # Default sentiment
+          if scores['compound'] >= 0.05:  # Check positive
+              sentiment = 'Positive'
+          elif scores['compound'] <= -0.05:  # Check negative
+              sentiment = 'Negative'
+          
+          club = user_profile.active_club  # Get active club
+          comment_obj = Comment.objects.create(  # Create comment
+              user_profile=user_profile,
+              text=comment,
+              sentiment=sentiment,
+              club=club,
+              topic=topic
+          )
+          club_stats, created = ClubStats.objects.get_or_create(user_profile=user_profile, club=club)  # Get or create ClubStats
+          if sentiment == 'Positive':  # Update for positive sentiment
+              club_stats.points = (club_stats.points or 0) + 10  # Add points
+              badges = club_stats.badges.split(', ') if club_stats.badges and club_stats.badges != 'None' else []  # Initialize badges
+              if 'Positive Fan' not in badges:  # Add Positive Fan badge
+                  badges.append('Positive Fan')
+                  club_stats.badges = ', '.join(badges) if badges else ''  # Save badges
+              comment_count = user_profile.comment_set.filter(club=club).count()  # Count comments
+              if comment_count >= 10 and 'Dedicated Fan' not in badges:  # Add Dedicated Fan badge
+                  badges.append('Dedicated Fan')
+                  club_stats.badges = ', '.join(badges) if badges else ''  # Save badges
+              if comment_count >= 20 and 'Loyal Supporters' not in badges:  # Add Loyal Supporters badge
+                  badges.append('Loyal Supporters')
+                  club_stats.badges = ', '.join(badges) if badges else ''  # Save badges
+              if topic and user_profile.comment_set.filter(club=club, topic=topic).count() >= 10 and 'Topic Expert' not in badges:  # Add Topic Expert badge
+                  badges.append('Topic Expert')
+                  club_stats.badges = ', '.join(badges) if badges else ''  # Save badges
+              club_stats.save()  # Save ClubStats
+          return JsonResponse({'sentiment': sentiment})  # Return sentiment
+      return JsonResponse({'error': 'Invalid request'}, status=400)  # Return error
 
-def update_stats(request):
-    # Update user stats via AJAX
-    if request.user.is_authenticated:
-        user_profile = get_or_create_user_profile(request)
-        if user_profile and user_profile.active_club:
-            club_stats = user_profile.club_stats.filter(club=user_profile.active_club).first()
-            comment_count = user_profile.comment_set.filter(club=user_profile.active_club).count()
-            points = club_stats.points if club_stats else 0
-            badges = club_stats.badges.split(', ') if club_stats and club_stats.badges != 'None' else []
-            badges_count = len(badges)
+def update_stats(request):  # Update user stats via AJAX
+    if request.user.is_authenticated:  # Check authentication
+        user_profile = get_or_create_user_profile(request)  # Get user profile
+        if user_profile and user_profile.active_club:  # Check active club
+            club_stats = user_profile.club_stats.filter(club=user_profile.active_club).first()  # Get club stats
+            comment_count = user_profile.comment_set.filter(club=user_profile.active_club).count()  # Count comments
+            points = club_stats.points if club_stats and club_stats.points is not None else 0  # Handle None points
+            badges = club_stats.badges.split(', ') if club_stats and club_stats.badges and club_stats.badges != 'None' else []  # Handle None badges
+            badges_count = len(badges)  # Count badges
         else:
-            comment_count = 0
-            points = 0
-            badges_count = 0
-        return JsonResponse({
+            comment_count = 0  # Default comment count
+            points = 0  # Default points
+            badges_count = 0  # Default badges count
+        return JsonResponse({  # Return JSON response
             'comment_count': comment_count,
             'points': points,
             'badges_count': badges_count
         })
-    return JsonResponse({'error': 'Please log in.'}, status=401)
+    return JsonResponse({'error': 'Please log in.'}, status=401)  # Return error
 
 def get_badges(request):
     # Fetch user badges via AJAX

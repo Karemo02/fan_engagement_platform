@@ -1,0 +1,10 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+    <h1>Start Simulation and Set Final Result</h1>
+    <form method="post">
+        {% csrf_token %}
+        <p>Enter the final score for {{ fixture.club.name }} vs {{ fixture.opponent }} (e.g., 2-1):</p>
+        {{ form.as_p }}  <!-- Render the form fields -->
+        <input type="submit" name="apply" value="Apply">
+    </form>
+{% endblock %}
